@@ -38,3 +38,6 @@ coverage/
 # Misc
 .cache/
 .tmp/
+
+# Scraped games and their journals
+games/

@@ -72,3 +72,23 @@ error               { "message": "…" }                 // targeted at the acto
    only in their own `snapshot`.
 4. **The host is not a privileged recipient.** For identical state, the host's
    `snapshot.board` and `snapshot.clue` are byte-identical to any other player's.
+
+## HTTP endpoints (pinned during Phase 5 integration)
+
+```jsonc
+POST /api/join
+  -> { "name": "Gibson", "admin_token": "…" }   // admin_token only when claiming host
+  <- 200 { "player_id": "p1", "token": "…", "is_host": true }
+  <- 400/403 { "message": "…" }
+
+POST /api/command?token=T                        // also accepts X-Jeopardy-Token
+  -> { "type": "buzz", … }
+  <- 202 { "ok": true } | 400/401/403 { "message": "…" }
+
+GET /api/time    <- { "server_ms": 1730000000000 }   // no token required
+GET /events?token=T                                   // SSE; opens with `snapshot`
+```
+
+The first player to join is seated as host, and `admin_token` from the server console
+is what authorizes that seat. It buys game management only — it is not a spoiler
+channel, and the host's snapshot stays byte-identical to every other player's.

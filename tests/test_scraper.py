@@ -97,5 +97,43 @@ class ScraperTest(unittest.TestCase):
                          self.game.to_json())
 
 
+class PreDoublingBoardTest(unittest.TestCase):
+    """Shows before the 2001-11-26 doubling used a $100-$500 board.
+
+    The values must come off the page, not from a modern ladder, or every clue in
+    an older game is worth twice what it aired for.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        path = os.path.join(HERE, "fixtures", "game_7000.html")
+        with open(path, encoding="utf-8") as fh:
+            cls.game = parse_game(fh.read(),
+                                  "https://j-archive.com/showgame.php?game_id=7000")
+
+    def test_it_is_the_game_we_think_it_is(self):
+        self.assertEqual(self.game.aired, "1995-03-10")
+
+    def test_row_values_are_historical(self):
+        rows = lambda rnd, col: [self.game.clue(f"{rnd}_{col}_{r}").value
+                                 for r in range(1, 6)]
+        self.assertEqual(rows(ROUND_J, 1), [100, 200, 300, 400, 500])
+        self.assertEqual(rows(ROUND_DJ, 1), [200, 400, 600, 800, 1000])
+
+    def test_daily_double_takes_its_row_value_from_a_sibling_cell(self):
+        # Its own header cell shows the contestant's wager, so the value has to
+        # come from another cell in the same row.
+        dd = [c for r in (ROUND_J, ROUND_DJ)
+              for c in self.game.rounds[r].clues.values() if c.is_daily_double]
+        self.assertEqual(len(dd), 3)
+        for clue in dd:
+            expected = 100 * clue.row if clue.round == ROUND_J else 200 * clue.row
+            self.assertEqual(clue.value, expected, clue.id)
+
+    def test_board_is_complete(self):
+        for rnd in (ROUND_J, ROUND_DJ):
+            self.assertEqual(len(self.game.rounds[rnd].clues), 30, rnd)
+
+
 if __name__ == "__main__":
     unittest.main()

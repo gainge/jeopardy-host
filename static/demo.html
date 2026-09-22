@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jeopardy — recorded stream</title>
+<link rel="stylesheet" href="./style.css">
+<style>
+  .demo-bar { display: flex; gap: .5rem; align-items: center; padding: .6rem 1rem;
+    background: #0b0f36; border-bottom: 2px solid #23306f; }
+  .demo-bar .muted { font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+<div class="demo-bar">
+  <button id="demo-step" type="button">Step</button>
+  <button id="demo-play" type="button">Play</button>
+  <button id="demo-reset" type="button">Reset</button>
+  <span id="demo-label" class="muted"></span>
+</div>
+<div id="demo-mount"></div>
+<script type="module" src="./demo.js"></script>
+</body>
+</html>

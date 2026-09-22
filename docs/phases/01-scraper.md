@@ -16,8 +16,10 @@ read it first. Do not modify it or the fixtures.
   a nested score table — all of which must be excluded. Inner `<i>` tags are stripped.
 - Daily Double: the header cell for that clue carries
   `<td class="clue_value_daily_double">DD: $1,200</td>`. **That figure is the
-  contestant's wager, not the cell value.** Derive value from row position using
-  `model.ROW_VALUES`. Never parse a value out of a DD cell.
+  contestant's wager, not the cell value.** Read the row's value from any other
+  cell in the same row; `model.ROW_VALUES` is only a fallback. Never parse a value
+  out of a DD cell. Pre-2001 shows used a $100-$500 board, so a hardcoded ladder
+  silently doubles them.
 - Categories: `<td class="category_name">`, six per round, in board order, inside
   that round's `<table class="round">`.
 - Final Jeopardy: `td#clue_FJ` / `td#clue_FJ_r` within the `final_jeopardy_round`

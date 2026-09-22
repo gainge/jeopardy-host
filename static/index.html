@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jeopardy</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%23060ce9'/%3E%3Ctext x='16' y='24' font-size='22' font-family='Georgia,serif' font-weight='bold' text-anchor='middle' fill='%23d69f4c'%3EJ%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<section id="join-view" class="join">
+  <h1 class="wordmark">JEOPARDY!</h1>
+  <form id="join-form" autocomplete="off">
+    <label for="join-name">Your name</label>
+    <input id="join-name" name="name" maxlength="24" required>
+    <label for="join-key">Host key <span class="muted">(optional)</span></label>
+    <input id="join-key" name="host_key" autocomplete="off">
+    <button type="submit" class="primary">Join the game</button>
+    <p id="join-error" class="error" hidden></p>
+  </form>
+</section>
+
+<section id="game-view" hidden>
+
+  <header id="topbar">
+    <span id="round-label" class="round"></span>
+    <span id="control-label" class="control"></span>
+    <span id="link-state" class="link" title="measured round trip"></span>
+  </header>
+
+  <p id="banner" class="banner" hidden></p>
+
+  <main class="stage">
+
+    <div id="board" class="board"></div>
+
+    <article id="clue-view" class="clue" hidden>
+      <div class="clue-head">
+        <span id="clue-category"></span>
+        <span id="clue-value" class="value"></span>
+      </div>
+      <p id="clue-text" class="clue-text"></p>
+      <div id="clue-media" class="media"></div>
+      <p id="clue-status" class="status"></p>
+      <p id="clue-answer" class="reveal" hidden></p>
+
+      <form id="dd-form" class="wager" hidden>
+        <label for="dd-input">Your wager <span id="dd-range" class="muted"></span></label>
+        <input id="dd-input" type="number" step="1" required>
+        <button type="submit" class="primary">Lock it in</button>
+      </form>
+
+      <div id="self-report" class="self-report" hidden>
+        <button id="report-right" class="verdict right" type="button">I was right</button>
+        <button id="report-wrong" class="verdict wrong" type="button">I was wrong</button>
+      </div>
+    </article>
+
+    <article id="final-view" class="final" hidden>
+      <h2 id="final-category" class="final-category"></h2>
+      <p id="final-text" class="clue-text"></p>
+      <div id="final-media" class="media"></div>
+      <p id="final-status" class="status"></p>
+
+      <form id="final-wager-form" class="wager" hidden>
+        <label for="final-wager-input">Your wager</label>
+        <input id="final-wager-input" type="number" step="1" min="0" required>
+        <button type="submit" class="primary">Lock it in</button>
+      </form>
+
+      <form id="final-response-form" class="wager" hidden>
+        <label for="final-response-input">Your response</label>
+        <input id="final-response-input" type="text" maxlength="200" required>
+        <button type="submit" class="primary">Submit</button>
+      </form>
+
+      <div id="final-reveal" class="reveal-table"></div>
+
+      <div id="final-self-report" class="self-report" hidden>
+        <button id="final-right" class="verdict right" type="button">I was right</button>
+        <button id="final-wrong" class="verdict wrong" type="button">I was wrong</button>
+      </div>
+    </article>
+
+  </main>
+
+  <section class="buzz-bar">
+    <button id="buzz-button" class="buzz" type="button" data-mode="idle">BUZZER</button>
+    <div class="buzz-side">
+      <p id="buzz-hint" class="hint"></p>
+      <ol id="race-readout" class="race"></ol>
+    </div>
+  </section>
+
+  <footer id="scores" class="scores"></footer>
+
+  <aside id="host-panel" class="host" hidden>
+    <h2>Facilitator</h2>
+    <p class="muted">You see exactly what every player sees. No responses, no Daily
+      Double markers — you are playing too.</p>
+    <div class="host-row">
+      <button id="host-start" type="button">Start round</button>
+      <button id="host-next" type="button">Next round</button>
+      <button id="host-resolve" type="button">Force resolve</button>
+      <button id="host-undo" type="button">Undo</button>
+    </div>
+    <div class="host-row">
+      <label for="host-target">Player</label>
+      <select id="host-target"></select>
+      <button id="host-control" type="button">Give board</button>
+      <button id="host-kick" type="button" class="danger">Kick</button>
+    </div>
+    <form id="host-adjust-form" class="host-row">
+      <label for="host-adjust-amount">Adjust</label>
+      <input id="host-adjust-amount" type="number" step="100" value="200">
+      <button id="host-negate" type="button" title="flip sign">+/-</button>
+      <input id="host-adjust-reason" type="text" maxlength="120" placeholder="reason">
+      <button type="submit">Apply</button>
+    </form>
+    <div id="host-diag" class="diag"></div>
+    <div id="host-flags" class="flags"></div>
+  </aside>
+
+</section>
+
+<script type="module">
+  import { main } from '/static/app.js';
+  main();
+</script>
+
+</body>
+</html>

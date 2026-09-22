@@ -65,13 +65,20 @@ error               { "message": "…" }                 // targeted at the acto
 
 ## Redaction rules, restated as invariants
 
-1. `answer` appears only in `clue_resolved` and `final_reveal`.
+1. `answer` appears only in `clue_resolved` and `final_reveal`. The one earned
+   exception is `answer_disclosed` (targeted at the current answer holder only,
+   after `host_reveal_response`) and its `snapshot` mirror, `clue.your_revealed_answer`
+   — never the bare `answer` key, and never sent to anyone but that one player.
 2. `is_daily_double` never appears in any payload. The fact is communicated solely by
    the presence of a `dd_revealed` event after selection.
 3. Final wagers and answers appear only in `final_reveal`, and a player's own choices
    only in their own `snapshot`.
 4. **The host is not a privileged recipient.** For identical state, the host's
-   `snapshot.board` and `snapshot.clue` are byte-identical to any other player's.
+   `snapshot.board` and `snapshot.clue` are byte-identical to any other player's,
+   except for the same kind of per-recipient field Final Jeopardy already has
+   (`your_wager`, `your_answer`) — `clue.your_revealed_answer` differs for the host
+   exactly when the host happens to be the one currently answering, same as anyone
+   else in that seat.
 
 ## HTTP endpoints (pinned during Phase 5 integration)
 

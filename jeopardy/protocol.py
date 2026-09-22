@@ -26,10 +26,13 @@ CMD_FINAL_WAGER = "final_wager"
 CMD_FINAL_ANSWER = "final_answer"
 CMD_FINAL_REPORT = "final_report"
 
-# Host-only. None of these carry or return clue answers.
+# Host-only. None of these carry or return clue answers to the HOST — but
+# CMD_HOST_REVEAL_RESPONSE does trigger disclosure to whoever currently holds the
+# answer, at the host's discretion (see EVT_ANSWER_DISCLOSED below).
 CMD_HOST_START_ROUND = "host_start_round"
 CMD_HOST_NEXT_ROUND = "host_next_round"
 CMD_HOST_FORCE_RESOLVE = "host_force_resolve"
+CMD_HOST_REVEAL_RESPONSE = "host_reveal_response"
 CMD_HOST_ADJUST_SCORE = "host_adjust_score"
 CMD_HOST_SET_CONTROL = "host_set_control"
 CMD_HOST_UNDO = "host_undo"
@@ -37,7 +40,8 @@ CMD_HOST_KICK = "host_kick"
 
 HOST_COMMANDS = frozenset({
     CMD_HOST_START_ROUND, CMD_HOST_NEXT_ROUND, CMD_HOST_FORCE_RESOLVE,
-    CMD_HOST_ADJUST_SCORE, CMD_HOST_SET_CONTROL, CMD_HOST_UNDO, CMD_HOST_KICK,
+    CMD_HOST_REVEAL_RESPONSE, CMD_HOST_ADJUST_SCORE, CMD_HOST_SET_CONTROL,
+    CMD_HOST_UNDO, CMD_HOST_KICK,
 })
 
 # --- Events: server -> client (SSE on /events) -------------------------------
@@ -51,8 +55,10 @@ EVT_BUZZERS_OPEN = "buzzers_open"
 EVT_BUZZ_REGISTERED = "buzz_registered"   # someone buzzed; order still undecided
 EVT_BUZZ_RESULT = "buzz_result"           # window closed; ordered race readout
 EVT_ANSWERING = "answering"
+EVT_ANSWER_REVEALED = "answer_revealed"   # broadcast fact only: {clue_id, player_id}
+EVT_ANSWER_DISCLOSED = "answer_disclosed" # targeted at the answer holder; carries the answer
 EVT_ANSWER_RESULT = "answer_result"
-EVT_CLUE_RESOLVED = "clue_resolved"       # the only event carrying a clue answer
+EVT_CLUE_RESOLVED = "clue_resolved"       # the only event that discloses the answer to everyone
 EVT_DD_REVEALED = "dd_revealed"
 EVT_DD_WAGER_SET = "dd_wager_set"
 EVT_FINAL_CATEGORY = "final_category"
@@ -163,6 +169,7 @@ COMMAND_SCHEMA: dict[str, dict[str, Callable[[Any], Any]]] = {
     CMD_HOST_START_ROUND: {},
     CMD_HOST_NEXT_ROUND: {},
     CMD_HOST_FORCE_RESOLVE: {},
+    CMD_HOST_REVEAL_RESPONSE: {},
     CMD_HOST_ADJUST_SCORE: {"player_id": _str(64), "delta": _int(-10**7, 10**7),
                             "reason": _str(120)},
     CMD_HOST_SET_CONTROL: {"player_id": _str(64)},

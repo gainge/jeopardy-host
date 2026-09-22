@@ -33,6 +33,7 @@ HOST_COMMAND_FIELDS = {
     P.CMD_HOST_START_ROUND: {},
     P.CMD_HOST_NEXT_ROUND: {},
     P.CMD_HOST_FORCE_RESOLVE: {},
+    P.CMD_HOST_REVEAL_RESPONSE: {},
     P.CMD_HOST_UNDO: {},
     P.CMD_HOST_ADJUST_SCORE: {"player_id": "p_x", "delta": -400, "reason": "misjudged"},
     P.CMD_HOST_SET_CONTROL: {"player_id": "p_x"},

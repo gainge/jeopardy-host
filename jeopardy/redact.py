@@ -5,6 +5,13 @@ redacted exactly like everyone else's. A clue's `answer` appears only once the
 engine has marked it disclosed, and `is_daily_double` only once the cell has been
 selected. tests/test_redact.py walks every serialized payload for every recipient
 and fails if either ever leaks early.
+
+One sanctioned early-disclosure channel exists: the current answer holder may be
+shown the real answer, at host discretion, before self-report (engine.py's
+`_reveal_answer`). That value travels under `your_revealed_answer`, never the bare
+`answer` key, the same way Final Jeopardy's own wager/answer already travel under
+`your_wager`/`your_answer` — so it never trips the `SECRET_KEYS`/`SEALED_KEYS`
+guard below, and never reaches anyone but the player it was revealed to.
 """
 
 from __future__ import annotations

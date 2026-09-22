@@ -9,6 +9,10 @@
 3. `jeopardy/protocol.py` and `jeopardy/model.py` are the frozen contract. If a phase
    believes the contract is wrong, it reports the problem — it does not unilaterally
    edit those two files, because three other phases are compiling against them.
+   (This was a phased, multi-implementer build constraint. Now that Phases 0-5 are
+   done and there is one implementer, the protocol is amended directly when a real
+   gameplay need arises — see `answer_disclosed`/`host_reveal_response` in
+   `docs/PROTOCOL.md` for the first such amendment.)
 4. **The host plays.** No code path may give the host earlier or richer knowledge than
    any other player. There is no "host view" of answers or Daily Doubles.
 

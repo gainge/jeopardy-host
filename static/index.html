@@ -52,8 +52,11 @@
       </form>
 
       <div id="self-report" class="self-report" hidden>
-        <button id="report-right" class="verdict right" type="button">I was right</button>
-        <button id="report-wrong" class="verdict wrong" type="button">I was wrong</button>
+        <p id="answer-spoiler" class="reveal spoiler"></p>
+        <div class="verdict-row">
+          <button id="report-right" class="verdict right" type="button">I was right</button>
+          <button id="report-wrong" class="verdict wrong" type="button">I was wrong</button>
+        </div>
       </div>
     </article>
 
@@ -103,6 +106,7 @@
       <button id="host-start" type="button">Start round</button>
       <button id="host-next" type="button">Next round</button>
       <button id="host-resolve" type="button">Force resolve</button>
+      <button id="host-reveal" type="button" hidden>Reveal answer</button>
       <button id="host-undo" type="button">Undo</button>
     </div>
     <div class="host-row">

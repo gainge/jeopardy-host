@@ -125,7 +125,13 @@ function renderClue(state, ctx) {
 
   const answering = clue.answering;
   const yourTurn = answering && answering === state.you;
-  els.selfReport.hidden = !yourTurn;
+  const revealed = yourTurn ? clue.your_revealed_answer : null;
+  els.selfReport.hidden = !revealed;
+  if (revealed && els.answerSpoiler.dataset.answer !== revealed) {
+    els.answerSpoiler.dataset.answer = revealed;
+    els.answerSpoiler.textContent = revealed;
+    els.answerSpoiler.classList.remove('shown');
+  }
 
   els.clueStatus.textContent = clueStatus(state, clue);
 }
@@ -133,8 +139,13 @@ function renderClue(state, ctx) {
 function clueStatus(state, clue) {
   if (clue.step === 'resolved') return 'correct response:';
   if (clue.answering) {
-    return clue.answering === state.you
-      ? 'you have the buzz — say it out loud, then report'
+    if (clue.answering === state.you) {
+      return clue.your_revealed_answer
+        ? 'check your answer, then report'
+        : 'you have the buzz — say it out loud';
+    }
+    return clue.revealed_player_id === clue.answering
+      ? `${playerName(state, clue.answering)} is checking their answer`
       : `${playerName(state, clue.answering)} is answering`;
   }
   if (clue.dd && clue.dd.amount === null) {

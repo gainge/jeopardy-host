@@ -47,6 +47,16 @@ export function playerName(state, playerId) {
   return p ? p.name : (playerId || '');
 }
 
+// Whether the host's reveal button should be live: someone holds the buzz and
+// hasn't yet been shown the answer. Lives here, not in host.js, so the host
+// panel's own source never has to name the thing it is kept from seeing.
+export function canRevealResponse(state) {
+  const clue = state.clue;
+  if (!clue || !clue.answering) return false;
+  if (clue.step !== 'answering' && clue.step !== 'dd_answering') return false;
+  return clue.revealed_player_id !== clue.answering;
+}
+
 export function reduce(state, type, data) {
   const d = data || {};
   const s = { ...state, log: state.log.concat([{ type, data: d }]).slice(-200) };
@@ -105,6 +115,8 @@ export function reduce(state, type, data) {
           dd: null,
           answer: null,
           lastResult: null,
+          revealed_player_id: null,
+          your_revealed_answer: null,
         },
         buzz: emptyBuzz(),
         banner: null,
@@ -135,8 +147,18 @@ export function reduce(state, type, data) {
           answering: d.player_id,
           deadline: d.deadline,
           lastResult: null,
+          revealed_player_id: null,
+          your_revealed_answer: null,
         },
       };
+
+    case 'answer_revealed':
+      if (!s.clue) return s;
+      return { ...s, clue: { ...s.clue, revealed_player_id: d.player_id } };
+
+    case 'answer_disclosed':
+      if (!s.clue) return s;
+      return { ...s, clue: { ...s.clue, your_revealed_answer: d.answer } };
 
     case 'answer_result':
       return {
@@ -147,6 +169,8 @@ export function reduce(state, type, data) {
           answering: null,
           deadline: null,
           lastResult: { player_id: d.player_id, correct: !!d.correct, score_delta: d.score_delta },
+          revealed_player_id: null,
+          your_revealed_answer: null,
         } : s.clue,
       };
 

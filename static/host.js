@@ -1,12 +1,18 @@
 /* The facilitator panel.
  *
- * The host plays, so this module deliberately contains no clue disclosure of any
- * kind — the server never sends the host one, and a panel that looked like it
+ * The host plays, so this module deliberately contains no clue disclosure to the
+ * host — the server never sends the host one, and a panel that looked like it
  * might would spoil the person running the call. Everything here is procedural:
  * round control, score correction, roster management, and clock diagnostics.
+ *
+ * The one exception is "Reveal response," which discloses nothing to the host
+ * either — it just tells the server to show the current holder their spoken
+ * response was correct or not, once the host has heard it out loud. Whether that
+ * is due is computed in state.js, not here, so this file never has to spell out
+ * what it is being kept from seeing.
  */
 
-import { playerName } from './state.js';
+import { playerName, canRevealResponse } from './state.js';
 
 const FLAGGED = new Set(['early', 'future', 'clamped', 'duplicate']);
 
@@ -21,6 +27,7 @@ export function mountHost(els, send) {
   els.hostStart.addEventListener('click', () => send({ type: 'host_start_round' }));
   els.hostNext.addEventListener('click', () => send({ type: 'host_next_round' }));
   els.hostResolve.addEventListener('click', () => send({ type: 'host_force_resolve' }));
+  els.hostReveal.addEventListener('click', () => send({ type: 'host_reveal_response' }));
   els.hostUndo.addEventListener('click', () => send({ type: 'host_undo' }));
 
   els.hostAdjustForm.addEventListener('submit', (e) => {
@@ -72,6 +79,8 @@ export function renderHost(state, els) {
 
   els.hostStart.hidden = state.phase !== 'lobby';
   els.hostNext.hidden = state.phase === 'lobby';
+
+  els.hostReveal.hidden = !canRevealResponse(state);
 
   els.hostDiag.replaceChildren();
   state.players.forEach((p) => {

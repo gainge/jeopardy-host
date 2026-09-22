@@ -177,11 +177,16 @@ button.danger { background: #5e1616; }
   background: #f4f4ef; }
 .wager button.primary { margin-top: 0; width: auto; }
 
-.self-report { margin-top: 1.6rem; display: flex; gap: 1rem; }
+.self-report { margin-top: 1.6rem; display: flex; flex-direction: column; gap: 1rem; }
+.verdict-row { display: flex; gap: 1rem; }
 .verdict { font-size: 1.3rem; font-weight: 800; padding: 1rem 2.2rem;
   text-transform: uppercase; letter-spacing: 0.06em; }
 .verdict.right { background: var(--right); }
 .verdict.wrong { background: var(--wrong); }
+
+.spoiler { cursor: pointer; filter: blur(6px); user-select: none;
+  transition: filter 0.15s ease; }
+.spoiler.shown { filter: none; cursor: text; }
 
 /* --- final --------------------------------------------------------------- */
 

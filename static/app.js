@@ -14,7 +14,8 @@ const SESSION_KEY = 'jeopardy.session';
 
 const EVENTS = [
   'snapshot', 'error', 'players', 'round_started', 'clue_selected',
-  'buzzers_open', 'buzz_registered', 'buzz_result', 'answering', 'answer_result',
+  'buzzers_open', 'buzz_registered', 'buzz_result', 'answering',
+  'answer_revealed', 'answer_disclosed', 'answer_result',
   'clue_resolved', 'dd_revealed', 'dd_wager_set', 'final_category',
   'final_wagers_open', 'final_wager_received', 'final_clue',
   'final_answer_received', 'final_reveal', 'final_result', 'score_adjusted',
@@ -40,8 +41,8 @@ export function collectEls() {
     ['clue', 'clue-view'], ['clueCategory', 'clue-category'], ['clueValue', 'clue-value'],
     ['clueText', 'clue-text'], ['clueMedia', 'clue-media'], ['clueStatus', 'clue-status'],
     ['clueAnswer', 'clue-answer'],
-    ['selfReport', 'self-report'], ['reportRight', 'report-right'],
-    ['reportWrong', 'report-wrong'],
+    ['selfReport', 'self-report'], ['answerSpoiler', 'answer-spoiler'],
+    ['reportRight', 'report-right'], ['reportWrong', 'report-wrong'],
     ['ddForm', 'dd-form'], ['ddInput', 'dd-input'], ['ddRange', 'dd-range'],
     ['final', 'final-view'], ['finalCategory', 'final-category'],
     ['finalText', 'final-text'], ['finalMedia', 'final-media'],
@@ -54,7 +55,8 @@ export function collectEls() {
     ['buzzButton', 'buzz-button'], ['buzzHint', 'buzz-hint'], ['race', 'race-readout'],
     ['scores', 'scores'],
     ['hostPanel', 'host-panel'], ['hostStart', 'host-start'], ['hostNext', 'host-next'],
-    ['hostResolve', 'host-resolve'], ['hostUndo', 'host-undo'],
+    ['hostResolve', 'host-resolve'], ['hostReveal', 'host-reveal'],
+    ['hostUndo', 'host-undo'],
     ['hostTarget', 'host-target'], ['hostControl', 'host-control'],
     ['hostKick', 'host-kick'], ['hostAdjustForm', 'host-adjust-form'],
     ['hostAdjustAmount', 'host-adjust-amount'],
@@ -170,6 +172,10 @@ export function main() {
       els.joinError.textContent = String(err.message || err);
       els.joinError.hidden = false;
     }
+  });
+
+  els.answerSpoiler.addEventListener('click', () => {
+    els.answerSpoiler.classList.toggle('shown');
   });
 
   els.reportRight.addEventListener('click', () => report(true));

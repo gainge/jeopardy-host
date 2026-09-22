@@ -117,6 +117,41 @@ class RedactionTest(unittest.TestCase):
         blob = json.dumps([e.payload for e in resolved])
         self.assertIn(answer, blob, "the answer must be disclosed on resolution")
 
+    def test_reveal_answer_is_targeted_to_the_holder_only(self):
+        self.engine.apply(self.host, P.CMD_HOST_START_ROUND, {}, self.now)
+        target = "J_2_1"
+        answer = self.game.clue(target).answer
+        self.engine.apply(self.host, P.CMD_SELECT_CLUE, {"clue_id": target}, self.now)
+        self.now += P.READ_MS_MAX + 1
+        self.engine.tick(self.now)
+        alice = self.ids["alice"]
+        self.engine.apply(alice, P.CMD_BUZZ, {
+            "clue_id": target, "press_server": self.now,
+            "offset_ms": 0, "rtt_ms": 0}, self.now)
+        self.now += P.BUZZ_WINDOW_MS + 1
+        self.engine.tick(self.now)
+
+        events = self.engine.apply(self.host, P.CMD_HOST_REVEAL_RESPONSE, {}, self.now)
+        revealed = [e for e in events if e.type == P.EVT_ANSWER_REVEALED]
+        disclosed = [e for e in events if e.type == P.EVT_ANSWER_DISCLOSED]
+        self.assertEqual(len(revealed), 1)
+        self.assertNotIn(answer, json.dumps(revealed[0].payload))
+        self.assertEqual(len(disclosed), 1)
+        self.assertEqual(disclosed[0].targets, [alice])
+        self.assertIn(answer, json.dumps(disclosed[0].payload))
+
+        snaps = self.snapshots()
+        self.assertEqual(snaps[alice]["clue"]["your_revealed_answer"], answer)
+        for pid in ("host", "bob"):
+            other = snaps[self.ids[pid]] if pid != "host" else snaps[self.host]
+            self.assertIsNone(other["clue"]["your_revealed_answer"])
+            self.assertEqual(scan(other, set()), [], f"answer leaked to {pid}")
+
+    def test_reveal_answer_is_host_only(self):
+        self.engine.apply(self.host, P.CMD_HOST_START_ROUND, {}, self.now)
+        events = self.engine.apply(self.ids["alice"], P.CMD_HOST_REVEAL_RESPONSE, {}, self.now)
+        self.assertEqual(events[0].type, P.EVT_ERROR)
+
     def test_final_wagers_and_answers_stay_sealed(self):
         self.engine.apply(self.host, P.CMD_HOST_START_ROUND, {}, self.now)
         # Drive to Final via the host, then seal-check one player's wager.

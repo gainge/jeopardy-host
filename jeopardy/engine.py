@@ -57,6 +57,7 @@ class ClueState:
     is_daily_double: bool = False
     dd_player: str | None = None
     dd_wager: int | None = None
+    revealed_to: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         d = dict(self.__dict__)
@@ -202,7 +203,7 @@ class Engine:
             "players": self._roster(),
             "control": st.control,
             "board": board,
-            "clue": self._public_clue_state(),
+            "clue": self._public_clue_state(player_id),
             "final": self._public_final_state(player_id),
         }
         redact.assert_no_leak(snap)
@@ -423,6 +424,27 @@ class Engine:
             return events + self._schedule_resolution(now)
         return events + self._advance_after_miss(now)
 
+    def _reveal_answer(self, actor: Player, fields: dict, now: int) -> list[Event]:
+        """Host-triggered: let the current answer holder see the answer, privately,
+        before they self-report. The host still never sees it — only the person
+        who is about to be judged on it does."""
+        clue = self.state.clue
+        if clue is None or clue.step not in (P.STEP_ANSWERING, P.STEP_DD_ANSWERING):
+            return [self._error(actor.id, "nobody is answering")]
+        holder = clue.dd_player if clue.is_daily_double else clue.order[clue.order_index]
+        if clue.revealed_to == holder:
+            return [self._error(actor.id, "the answer is already revealed")]
+        clue.revealed_to = holder
+        # Revealing the answer stands in for "an answer was already given," so the
+        # forfeiture clock no longer serves a purpose once the host confirms that.
+        clue.answer_deadline = None
+        answer = self.game.clue(clue.clue_id).answer
+        return [
+            Event(P.EVT_ANSWER_REVEALED, {"clue_id": clue.clue_id, "player_id": holder}),
+            Event(P.EVT_ANSWER_DISCLOSED, {"clue_id": clue.clue_id, "answer": answer},
+                  targets=[holder]),
+        ]
+
     def _answer_timeout(self, at: int) -> list[Event]:
         """A held buzz that never produced an answer costs nothing but the turn."""
         clue = self.state.clue
@@ -443,6 +465,7 @@ class Engine:
         if holder not in clue.attempted:
             clue.attempted.append(holder)
         clue.answer_deadline = None
+        clue.revealed_to = None
 
         while clue.order_index + 1 < len(clue.order):
             clue.order_index += 1
@@ -724,7 +747,7 @@ class Engine:
 
     # --- snapshot helpers ---------------------------------------------------
 
-    def _public_clue_state(self) -> dict[str, Any] | None:
+    def _public_clue_state(self, player_id: str) -> dict[str, Any] | None:
         clue = self.state.clue
         if clue is None or clue.step == P.STEP_RESOLVED:
             return None
@@ -734,9 +757,15 @@ class Engine:
         elif clue.step == P.STEP_ANSWERING and clue.order:
             answering = clue.order[clue.order_index]
         public = redact.public_clue(self.game, clue.clue_id)
+        # revealed_player_id is a fact everyone may see (mirrors EVT_ANSWER_REVEALED);
+        # your_revealed_answer is the earned disclosure itself, visible only to the
+        # player it was revealed to — the same shape as Final Jeopardy's
+        # your_wager/your_answer fields below.
         return {**public, "unlock_at": clue.unlock_at,
                 "selected_by": clue.selected_by, "step": clue.step,
-                "answering": answering}
+                "answering": answering, "revealed_player_id": clue.revealed_to,
+                "your_revealed_answer": (self.game.clue(clue.clue_id).answer
+                                         if clue.revealed_to == player_id else None)}
 
     def _public_final_state(self, player_id: str) -> dict[str, Any] | None:
         fin = self.state.final
@@ -776,6 +805,7 @@ class Engine:
         P.CMD_HOST_START_ROUND: _start_round,
         P.CMD_HOST_NEXT_ROUND: _next_round,
         P.CMD_HOST_FORCE_RESOLVE: _force_resolve,
+        P.CMD_HOST_REVEAL_RESPONSE: _reveal_answer,
         P.CMD_HOST_ADJUST_SCORE: _adjust_score,
         P.CMD_HOST_SET_CONTROL: _set_control,
         P.CMD_HOST_UNDO: _undo,

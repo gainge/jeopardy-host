@@ -1,0 +1,40 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Env & secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+logs/
+
+# Dependencies
+node_modules/
+.pnp/
+.yarn/integrity
+
+# Build output
+dist/
+build/
+out/
+*.egg-info/
+__pycache__/
+*.pyc
+
+# Coverage & test artifacts
+coverage/
+.nyc_output/
+
+# Misc
+.cache/
+.tmp/

@@ -1,0 +1,74 @@
+# Wire protocol
+
+Names live in `jeopardy/protocol.py`; this file pins the **payload shapes**, which is
+where four parallel implementations would otherwise drift. Phase 2 emits exactly these;
+Phase 4 consumes exactly these.
+
+Times are integer milliseconds in **server** time. Money is a plain integer of dollars.
+
+## Transport
+
+- Server -> client: SSE on `GET /events?token=T`. Each frame is
+  `event: <type>\ndata: <json>\n\n`. Idle frames are `: heartbeat`.
+- Client -> server: `POST /api/command` with `{"type": …, …fields}`, validated by
+  `protocol.validate_command`. Extra fields are dropped, missing fields rejected.
+
+## Events
+
+```jsonc
+snapshot            // targeted, sent on connect and after reconnect; full replacement
+{ "phase": "lobby|round|final|game_over", "round": "J|DJ|FJ|null",
+  "you": "<player_id>", "is_host": false,
+  "players": [ {"id","name","score","connected","is_host","rtt_ms","offset_ms"} ],
+  "control": "<player_id>|null",
+  "board": { "categories": ["…x6"],
+             "cells": [ {"clue_id","col","row","value","available"} ] },
+  "clue": null | { …clue_selected payload…, "step": "reading|open|window|answering",
+                   "answering": "<player_id>|null" },
+  "final": null | { "step","category","you_wagered":bool,"you_answered":bool,
+                    "submitted": ["<player_id>"] } }
+
+players             { "players": [ …as above… ] }
+control_changed     { "player_id": "…" }
+round_started       { "round": "J", "categories": [...], "cells": [...] }
+
+clue_selected       { "clue_id","category","value","text","media":[...],
+                      "unlock_at": 1730000000000, "selected_by": "<player_id>" }
+                    // never carries answer or is_daily_double
+buzzers_open        { "clue_id" }
+buzz_registered     { "clue_id", "player_id" }        // order still undecided
+buzz_result         { "clue_id",
+                      "order": [ {"player_id","delta_ms","status","press_server"} ],
+                      "rejected": [ {"player_id","status"} ] }
+answering           { "clue_id","player_id","deadline" }
+answer_result       { "clue_id","player_id","correct":bool,"score_delta":-400 }
+clue_resolved       { "clue_id","answer","scores":{"<player_id>":1200} }
+                    // the ONLY event that ever carries a clue answer
+
+dd_revealed         { "clue_id","player_id","min_wager","max_wager" }
+dd_wager_set        { "clue_id","player_id","amount" }
+
+final_category      { "category" }
+final_wagers_open   { "participants": ["<player_id>"], "deadline" }
+final_wager_received{ "player_id" }                    // who, never how much
+final_clue          { "text","media":[...],"deadline" }
+final_answer_received { "player_id" }                  // who, never what
+final_reveal        { "answer",
+                      "entries": [ {"player_id","wager","answer"} ] }
+final_result        { "player_id","correct":bool,"score_delta":-2000,
+                      "scores":{"<player_id>":9200} }
+
+score_adjusted      { "player_id","delta","reason","by":"<host_id>","score":800 }
+game_over           { "scores":{...}, "winner":"<player_id>" }
+error               { "message": "…" }                 // targeted at the actor
+```
+
+## Redaction rules, restated as invariants
+
+1. `answer` appears only in `clue_resolved` and `final_reveal`.
+2. `is_daily_double` never appears in any payload. The fact is communicated solely by
+   the presence of a `dd_revealed` event after selection.
+3. Final wagers and answers appear only in `final_reveal`, and a player's own choices
+   only in their own `snapshot`.
+4. **The host is not a privileged recipient.** For identical state, the host's
+   `snapshot.board` and `snapshot.clue` are byte-identical to any other player's.

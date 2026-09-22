@@ -1,0 +1,788 @@
+{
+  "aired": "2026-09-18",
+  "game_id": "9537",
+  "rounds": {
+    "DJ": {
+      "categories": [
+        "MIDTERM ELECTIONS",
+        "LEGALLY LATIN",
+        "BROADWAY MUSICALS BY SONGS",
+        "RELIGIOUS FRUIT",
+        "PORTMANTEAUS & BLENDED WORDS",
+        "5 \"BAD\" PLACES TO SEE BEFORE YOU DIE"
+      ],
+      "clues": {
+        "DJ_1_1": {
+          "answer": "Watergate",
+          "category": "MIDTERM ELECTIONS",
+          "col": 1,
+          "id": "DJ_1_1",
+          "is_daily_double": false,
+          "media": [],
+          "round": "DJ",
+          "row": 1,
+          "text": "With reform on their minds, those first elected to Congress in 1974 like Henry Waxman & Tom Harkin were called this scandal's \"Babies\"",
+          "value": 400
+        },
+        "DJ_1_2": {
+          "answer": "(Harry) Truman",
+          "category": "MIDTERM ELECTIONS",
+          "col": 1,
+          "id": "DJ_1_2",
+          "is_daily_double": false,
+          "media": [],
+          "round": "DJ",
+          "row": 2,
+          "text": "November 1950 was a tough month for him: an assassination attempt as he napped in his underwear at Blair House, then Democratic losses",
+          "value": 800
+        },
+        "DJ_1_3": {
+          "answer": "the Era of Good Feelings",
+          "category": "MIDTERM ELECTIONS",
+          "col": 1,
+          "id": "DJ_1_3",
+          "is_daily_double": true,
+          "media": [],
+          "round": "DJ",
+          "row": 3,
+          "text": "The 1826 midterms, the first to take House control from an incumbent pres.' party, put a definite end to this 10-year-old era",
+          "value": 1200
+        },
+        "DJ_1_4": {
+          "answer": "the Treaty of Versailles",
+          "category": "MIDTERM ELECTIONS",
+          "col": 1,
+          "id": "DJ_1_4",
+          "is_daily_double": false,
+          "media": [
+            "https://www.j-archive.com/media/2026-09-18_DJ_09.jpg"
+          ],
+          "round": "DJ",
+          "row": 4,
+          "text": "1918's midterms made Republican Henry Cabot Lodge Senate Majority Leader, dooming this treaty the Senate rejected the following November",
+          "value": 1600
+        },
+        "DJ_1_5": {
+          "answer": "the Union Party",
+          "category": "MIDTERM ELECTIONS",
+          "col": 1,
+          "id": "DJ_1_5",
+          "is_daily_double": false,
+          "media": [],
+          "round": "DJ",
+          "row": 5,
+          "text": "Losses in the Civil War midterms pushed the GOP into an alliance with this party whose name tells you which side of the war it was on",
+          "value": 2000
+        },
+        "DJ_2_1": {
+          "answer": "fiat",
+          "category": "LEGALLY LATIN",
+          "col": 2,
+          "id": "DJ_2_1",
+          "is_daily_double": false,
+          "media": [],
+          "round": "DJ",
+          "row": 1,
+          "text": "\"Let it be done\", or the Euro car brand that makes the Grande Panda",
+          "value": 400
+        },
+        "DJ_2_2": {
+          "answer": "prima facie",
+          "category": "LEGALLY LATIN",
+          "col": 2,
+          "id": "DJ_2_2",
+          "is_daily_double": false,
+          "media": [],
+          "round": "DJ",
+          "row": 2,
+          "text": "This 2-word term, \"at first sight\", is a type of \"evidence\" that sustains a fact until proven otherwise",
+          "value": 800
+        },
+        "DJ_2_3": {
+          "answer": "ex parte",
+          "category": "LEGALLY LATIN",
+          "col": 2,
+          "id": "DJ_2_3",
+          "is_daily_double": true,
+          "media": [],
+          "round": "DJ",
+          "row": 3,
+          "text": "If a judge conducts a hearing with only one of the 2 contending parties present, it's being held this Latin way",
+          "value": 1200
+        },
+        "DJ_2_4": {
+          "answer": "corpus delicti",
+          "category": "LEGALLY LATIN",
+          "col": 2,
+          "id": "DJ_2_4",
+          "is_daily_double": false,
+          "media": [],
+          "round": "DJ",
+          "row": 4,
+          "text": "Uncover this, the \"body of the crime\"; it goes to the principle of no one getting convicted of a crime without real evidence",
+          "value": 1600
+        },
+        "DJ_2_5": {
+          "answer": "stare decisis",
+          "category": "LEGALLY LATIN",
+          "col": 2,
+          "id": "DJ_2_5",
+          "is_daily_double": false,
+          "media": [],
+          "round": "DJ",
+          "row": 5,
+          "text": "You hear a lot about this phrase, \"to stand by things decided\", regarding Supreme Court decisions that uphold precedents",
+          "value": 2000
+        },
+        "DJ_3_1": {
+          "answer": "Annie",
+          "category": "BROADWAY MUSICALS BY SONGS",
+          "col": 3,
+          "id": "DJ_3_1",
+          "is_daily_double": false,
+          "media": [],
+          "round": "DJ",
+          "row": 1,
+          "text": "\"It's The Hard-Knock Life\" & \"Tomorrow\"",
+          "value": 400
+        },
+        "DJ_3_2": {
+          "answer": "Cats",
+          "category": "BROADWAY MUSICALS BY SONGS",
+          "col": 3,
+          "id": "DJ_3_2",
+          "is_daily_double": false,
+          "media": [],
+          "round": "DJ",
+          "row": 2,
+          "text": "\"The Rum Tum Tugger\" & \"Old Deuteronomy\"",
+          "value": 800
+        },
+        "DJ_3_3": {
+          "answer": "West Side Story",
+          "category": "BROADWAY MUSICALS BY SONGS",
+          "col": 3,
+          "id": "DJ_3_3",
+          "is_daily_double": false,
+          "media": [],
+          "round": "DJ",
+          "row": 3,
+          "text": "\"America\" & \"I Feel Pretty\"",
+          "value": 1200
+        },
+        "DJ_3_4": {
+          "answer": "My Fair Lady",
+          "category": "BROADWAY MUSICALS BY SONGS",
+          "col": 3,
+          "id": "DJ_3_4",
+          "is_daily_double": false,
+          "media": [],
+          "round": "DJ",
+          "row": 4,
+          "text": "\"The Rain In Spain\" & \"Get Me To The Church On Time\"",
+          "value": 1600
+        },
+        "DJ_3_5": {
+          "answer": "Jesus Christ Superstar",
+          "category": "BROADWAY MUSICALS BY SONGS",
+          "col": 3,
+          "id": "DJ_3_5",
+          "is_daily_double": false,
+          "media": [],
+          "round": "DJ",
+          "row": 5,
+          "text": "\"Hosanna\" & \"I Don't Know How To Love Him\"",
+          "value": 2000
+        },
+        "DJ_4_1": {
+          "answer": "a coconut",
+          "category": "RELIGIOUS FRUIT",
+          "col": 4,
+          "id": "DJ_4_1",
+          "is_daily_double": false,
+          "media": [],
+          "round": "DJ",
+          "row": 1,
+          "text": "Wahi ka niu, to \"break open\" this hard-shelled fruit, was a sign of piety in Polynesia of yore",
+          "value": 400
+        },
+        "DJ_4_2": {
+          "answer": "a date",
+          "category": "RELIGIOUS FRUIT",
+          "col": 4,
+          "id": "DJ_4_2",
+          "is_daily_double": false,
+          "media": [],
+          "round": "DJ",
+          "row": 2,
+          "text": "In some countries it's customary to break the Ramadan fast with this fruit, like the medjool",
+          "value": 800
+        },
+        "DJ_4_3": {
+          "answer": "Song of Songs (Song of Solomon)",
+          "category": "RELIGIOUS FRUIT",
+          "col": 4,
+          "id": "DJ_4_3",
+          "is_daily_double": false,
+          "media": [],
+          "round": "DJ",
+          "row": 3,
+          "text": "From this Bible book: \"Thy breasts shall be as clusters of the vine, & the smell of thy nose like apples\"",
+          "value": 1200
+        },
+        "DJ_4_4": {
+          "answer": "the banana",
+          "category": "RELIGIOUS FRUIT",
+          "col": 4,
+          "id": "DJ_4_4",
+          "is_daily_double": false,
+          "media": [],
+          "round": "DJ",
+          "row": 4,
+          "text": "Medieval European pilgrims to the Holy Land encountering this oblong fruit noted a cross appeared when it was sliced",
+          "value": 1600
+        },
+        "DJ_4_5": {
+          "answer": "Sukkot",
+          "category": "RELIGIOUS FRUIT",
+          "col": 4,
+          "id": "DJ_4_5",
+          "is_daily_double": false,
+          "media": [],
+          "round": "DJ",
+          "row": 5,
+          "text": "Etrog, a citrus fruit, is used during this week-long holiday in Judaism also known as the Feast of Tabernacles",
+          "value": 2000
+        },
+        "DJ_5_1": {
+          "answer": "a mocktail",
+          "category": "PORTMANTEAUS & BLENDED WORDS",
+          "col": 5,
+          "id": "DJ_5_1",
+          "is_daily_double": false,
+          "media": [],
+          "round": "DJ",
+          "row": 1,
+          "text": "A Mai Tai or Manhattan, but with no alcohol in it",
+          "value": 400
+        },
+        "DJ_5_2": {
+          "answer": "a contrail",
+          "category": "PORTMANTEAUS & BLENDED WORDS",
+          "col": 5,
+          "id": "DJ_5_2",
+          "is_daily_double": false,
+          "media": [
+            "https://www.j-archive.com/media/2026-09-18_DJ_15.jpg"
+          ],
+          "round": "DJ",
+          "row": 2,
+          "text": "The visible streak that can form in the wake of a jumbo jet",
+          "value": 800
+        },
+        "DJ_5_3": {
+          "answer": "squiggle",
+          "category": "PORTMANTEAUS & BLENDED WORDS",
+          "col": 5,
+          "id": "DJ_5_3",
+          "is_daily_double": false,
+          "media": [],
+          "round": "DJ",
+          "row": 3,
+          "text": "This word dates back over 120 years, long before it came to mean a scrawled signature",
+          "value": 1200
+        },
+        "DJ_5_4": {
+          "answer": "a Maltipoo",
+          "category": "PORTMANTEAUS & BLENDED WORDS",
+          "col": 5,
+          "id": "DJ_5_4",
+          "is_daily_double": false,
+          "media": [
+            "https://www.j-archive.com/media/2026-09-18_DJ_13.jpg"
+          ],
+          "round": "DJ",
+          "row": 4,
+          "text": "Many types of dogs have portmanteau names like this cross between two breeds, one from an island",
+          "value": 1600
+        },
+        "DJ_5_5": {
+          "answer": "Xenocide",
+          "category": "PORTMANTEAUS & BLENDED WORDS",
+          "col": 5,
+          "id": "DJ_5_5",
+          "is_daily_double": false,
+          "media": [],
+          "round": "DJ",
+          "row": 5,
+          "text": "The killing of an entire alien species, it's the title of a sci-fi novel by Orson Scott Card",
+          "value": 2000
+        },
+        "DJ_6_1": {
+          "answer": "Badlands",
+          "category": "5 \"BAD\" PLACES TO SEE BEFORE YOU DIE",
+          "col": 6,
+          "id": "DJ_6_1",
+          "is_daily_double": false,
+          "media": [],
+          "round": "DJ",
+          "row": 1,
+          "text": "nps.gov mentions mixed-grass prairie & a 75-million-year fossil record on its website for this national park",
+          "value": 400
+        },
+        "DJ_6_2": {
+          "answer": "Baden-Baden",
+          "category": "5 \"BAD\" PLACES TO SEE BEFORE YOU DIE",
+          "col": 6,
+          "id": "DJ_6_2",
+          "is_daily_double": false,
+          "media": [],
+          "round": "DJ",
+          "row": 2,
+          "text": "This German city in the Black Forest with a double-talk name has Roman baths built more than 2,000 years ago",
+          "value": 800
+        },
+        "DJ_6_3": {
+          "answer": "Islamabad",
+          "category": "5 \"BAD\" PLACES TO SEE BEFORE YOU DIE",
+          "col": 6,
+          "id": "DJ_6_3",
+          "is_daily_double": false,
+          "media": [],
+          "round": "DJ",
+          "row": 3,
+          "text": "In the 1960s a Greek architect designed this world capital about 10 miles from Rawalpindi",
+          "value": 1200
+        },
+        "DJ_6_4": {
+          "answer": "Badwater Basin",
+          "category": "5 \"BAD\" PLACES TO SEE BEFORE YOU DIE",
+          "col": 6,
+          "id": "DJ_6_4",
+          "is_daily_double": false,
+          "media": [],
+          "round": "DJ",
+          "row": 4,
+          "text": "From Telescope Peak, you can see the highest & lowest points in the cont. U.S.--Mount Whitney & this low \"Basin\" in Death Valley",
+          "value": 1600
+        },
+        "DJ_6_5": {
+          "answer": "Hyderabad",
+          "category": "5 \"BAD\" PLACES TO SEE BEFORE YOU DIE",
+          "col": 6,
+          "id": "DJ_6_5",
+          "is_daily_double": false,
+          "media": [
+            "https://www.j-archive.com/media/2026-09-18_DJ_19.jpg"
+          ],
+          "round": "DJ",
+          "row": 5,
+          "text": "This city in India's Deccan Plateau is home to the world tallest monolith of Gautama Buddha",
+          "value": 2000
+        }
+      },
+      "name": "DJ"
+    },
+    "FJ": {
+      "categories": [
+        "FICTIONAL CHARACTERS"
+      ],
+      "clues": {
+        "FJ": {
+          "answer": "Grendel",
+          "category": "FICTIONAL CHARACTERS",
+          "col": 0,
+          "id": "FJ",
+          "is_daily_double": false,
+          "media": [],
+          "round": "FJ",
+          "row": 0,
+          "text": "An outcast, this character plagues a hall called Heorot for a dozen years",
+          "value": 0
+        }
+      },
+      "name": "FJ"
+    },
+    "J": {
+      "categories": [
+        "RECAPS OF SHAKESPEARE",
+        "TALK LIKE A PIRATE",
+        "SCIENCE",
+        "FOOD & DRINK",
+        "FALSE BERLIN",
+        "BIZARRE LITTLE MEN"
+      ],
+      "clues": {
+        "J_1_1": {
+          "answer": "Othello",
+          "category": "RECAPS OF SHAKESPEARE",
+          "col": 1,
+          "id": "J_1_1",
+          "is_daily_double": false,
+          "media": [],
+          "round": "J",
+          "row": 1,
+          "text": "An interracial marriage produces external hatred & internal insecurities that lead to tragedy",
+          "value": 200
+        },
+        "J_1_2": {
+          "answer": "The Tempest",
+          "category": "RECAPS OF SHAKESPEARE",
+          "col": 1,
+          "id": "J_1_2",
+          "is_daily_double": false,
+          "media": [],
+          "round": "J",
+          "row": 2,
+          "text": "After a shipwreck, an island has unusual inhabitants of the wizard, monster & sprite variety",
+          "value": 400
+        },
+        "J_1_3": {
+          "answer": "Henry V",
+          "category": "RECAPS OF SHAKESPEARE",
+          "col": 1,
+          "id": "J_1_3",
+          "is_daily_double": false,
+          "media": [],
+          "round": "J",
+          "row": 3,
+          "text": "An outnumbered army achieves success & the triumphant victor marries a French princess",
+          "value": 600
+        },
+        "J_1_4": {
+          "answer": "The Two Gentlemen of Verona",
+          "category": "RECAPS OF SHAKESPEARE",
+          "col": 1,
+          "id": "J_1_4",
+          "is_daily_double": true,
+          "media": [],
+          "round": "J",
+          "row": 4,
+          "text": "Both guys from out of town marry the women of their dreams & a band of outlaws gets pardoned",
+          "value": 800
+        },
+        "J_1_5": {
+          "answer": "As You Like It",
+          "category": "RECAPS OF SHAKESPEARE",
+          "col": 1,
+          "id": "J_1_5",
+          "is_daily_double": false,
+          "media": [],
+          "round": "J",
+          "row": 5,
+          "text": "After his brother becomes a monk, a duke residing in a forest is restored to his rightful rule & everyone lives happily ever after",
+          "value": 1000
+        },
+        "J_2_1": {
+          "answer": "archipelago",
+          "category": "TALK LIKE A PIRATE",
+          "col": 2,
+          "id": "J_2_1",
+          "is_daily_double": false,
+          "media": [],
+          "round": "J",
+          "row": 1,
+          "text": "It's a chain of related islands, like the Malay one",
+          "value": 200
+        },
+        "J_2_2": {
+          "answer": "Argentina",
+          "category": "TALK LIKE A PIRATE",
+          "col": 2,
+          "id": "J_2_2",
+          "is_daily_double": false,
+          "media": [],
+          "round": "J",
+          "row": 2,
+          "text": "This country declared its independence from Spain in 1816 as the United Provinces of the Rio de la Plata",
+          "value": 400
+        },
+        "J_2_3": {
+          "answer": "Arcana",
+          "category": "TALK LIKE A PIRATE",
+          "col": 2,
+          "id": "J_2_3",
+          "is_daily_double": false,
+          "media": [],
+          "round": "J",
+          "row": 3,
+          "text": "The 22 picture cards in a tarot deck are referred to as the \"Major\" this, meaning secret & mysterious knowledge",
+          "value": 600
+        },
+        "J_2_4": {
+          "answer": "ardor",
+          "category": "TALK LIKE A PIRATE",
+          "col": 2,
+          "id": "J_2_4",
+          "is_daily_double": false,
+          "media": [],
+          "round": "J",
+          "row": 4,
+          "text": "Latin for \"to burn\" gives us this noun for a burning passion",
+          "value": 800
+        },
+        "J_2_5": {
+          "answer": "the Argonne",
+          "category": "TALK LIKE A PIRATE",
+          "col": 2,
+          "id": "J_2_5",
+          "is_daily_double": false,
+          "media": [],
+          "round": "J",
+          "row": 5,
+          "text": "This hilly forested region of northern France follows \"Meuse\" in the name of a major Allied offensive in 1918",
+          "value": 1000
+        },
+        "J_3_1": {
+          "answer": "force",
+          "category": "SCIENCE",
+          "col": 3,
+          "id": "J_3_1",
+          "is_daily_double": false,
+          "media": [],
+          "round": "J",
+          "row": 1,
+          "text": "Hooke's law says the amount of this needed to compress a spring a given distance is proportional to that distance",
+          "value": 200
+        },
+        "J_3_2": {
+          "answer": "turbulence",
+          "category": "SCIENCE",
+          "col": 3,
+          "id": "J_3_2",
+          "is_daily_double": false,
+          "media": [],
+          "round": "J",
+          "row": 2,
+          "text": "Fasten your seatbelts! Clear-air this occurs when hard-to-predict winds collide at different speeds",
+          "value": 400
+        },
+        "J_3_3": {
+          "answer": "wisdom teeth",
+          "category": "SCIENCE",
+          "col": 3,
+          "id": "J_3_3",
+          "is_daily_double": false,
+          "media": [],
+          "round": "J",
+          "row": 3,
+          "text": "These third & final molars usually arrive on the cusp of adulthood",
+          "value": 600
+        },
+        "J_3_4": {
+          "answer": "pheromones",
+          "category": "SCIENCE",
+          "col": 3,
+          "id": "J_3_4",
+          "is_daily_double": false,
+          "media": [],
+          "round": "J",
+          "row": 4,
+          "text": "When an animal eats acacia leaves, the tree releases these chemical signals in the form of ethylene gas to alarm nearby trees",
+          "value": 800
+        },
+        "J_3_5": {
+          "answer": "Kuiper",
+          "category": "SCIENCE",
+          "col": 3,
+          "id": "J_3_5",
+          "is_daily_double": false,
+          "media": [],
+          "round": "J",
+          "row": 5,
+          "text": "The outer solar system has a \"Belt\" of icy objects & this same-named seemingly empty \"Cliff\"",
+          "value": 1000
+        },
+        "J_4_1": {
+          "answer": "a Bloody Mary",
+          "category": "FOOD & DRINK",
+          "col": 4,
+          "id": "J_4_1",
+          "is_daily_double": false,
+          "media": [],
+          "round": "J",
+          "row": 1,
+          "text": "A Red Snapper is a variation of this cocktail made with tomato juice, but using gin instead of vodka",
+          "value": 200
+        },
+        "J_4_2": {
+          "answer": "cauliflower",
+          "category": "FOOD & DRINK",
+          "col": 4,
+          "id": "J_4_2",
+          "is_daily_double": false,
+          "media": [
+            "https://www.j-archive.com/media/2026-09-18_J_16.jpg"
+          ],
+          "round": "J",
+          "row": 2,
+          "text": "No, it doesn't really taste like chicken, but you can make buffalo bites using this vegetable",
+          "value": 400
+        },
+        "J_4_3": {
+          "answer": "Colada",
+          "category": "FOOD & DRINK",
+          "col": 4,
+          "id": "J_4_3",
+          "is_daily_double": false,
+          "media": [],
+          "round": "J",
+          "row": 3,
+          "text": "Red Lobster's drink of rum, pineapple flavoring & cream of coconut had the 2-word rhyming name Alotta this",
+          "value": 600
+        },
+        "J_4_4": {
+          "answer": "foie gras",
+          "category": "FOOD & DRINK",
+          "col": 4,
+          "id": "J_4_4",
+          "is_daily_double": false,
+          "media": [],
+          "round": "J",
+          "row": 4,
+          "text": "California is one of the many places that has banned the sale of this fattened goose liver due to animal cruelty",
+          "value": 800
+        },
+        "J_4_5": {
+          "answer": "curry",
+          "category": "FOOD & DRINK",
+          "col": 4,
+          "id": "J_4_5",
+          "is_daily_double": false,
+          "media": [],
+          "round": "J",
+          "row": 5,
+          "text": "Panang & massaman are Thai varieties of this dish",
+          "value": 1000
+        },
+        "J_5_1": {
+          "answer": "Jason Bourne",
+          "category": "FALSE BERLIN",
+          "col": 5,
+          "id": "J_5_1",
+          "is_daily_double": false,
+          "media": [],
+          "round": "J",
+          "row": 1,
+          "text": "The 2004 film starring Matt Damon as this CIA agent out in the cold includes a scene at the World Clock in Alexanderplatz",
+          "value": 200
+        },
+        "J_5_2": {
+          "answer": "Cabaret",
+          "category": "FALSE BERLIN",
+          "col": 5,
+          "id": "J_5_2",
+          "is_daily_double": false,
+          "media": [],
+          "round": "J",
+          "row": 2,
+          "text": "Published in 1945, \"The Berlin Stories\" inspired this musical",
+          "value": 400
+        },
+        "J_5_3": {
+          "answer": "Bridge of Spies",
+          "category": "FALSE BERLIN",
+          "col": 5,
+          "id": "J_5_3",
+          "is_daily_double": false,
+          "media": [],
+          "round": "J",
+          "row": 3,
+          "text": "One real Berlin: the title of this film refers to the spot in Berlin where Rudolf Abel was traded for an American",
+          "value": 600
+        },
+        "J_5_4": {
+          "answer": "Atomic Blonde",
+          "category": "FALSE BERLIN",
+          "col": 5,
+          "id": "J_5_4",
+          "is_daily_double": false,
+          "media": [
+            "https://www.j-archive.com/media/2026-09-18_J_24.jpg"
+          ],
+          "round": "J",
+          "row": 4,
+          "text": "The graphic novel \"The Coldest City\", aka Berlin, became this Cold War thriller starring Charlize Theron",
+          "value": 800
+        },
+        "J_5_5": {
+          "answer": "Checkpoint Charlie",
+          "category": "FALSE BERLIN",
+          "col": 5,
+          "id": "J_5_5",
+          "is_daily_double": false,
+          "media": [],
+          "round": "J",
+          "row": 5,
+          "text": "The 1983 Bond film \"Octopussy\" has 007 crossing from West Berlin into East Berlin via this infamous checkpoint",
+          "value": 1000
+        },
+        "J_6_1": {
+          "answer": "elves",
+          "category": "BIZARRE LITTLE MEN",
+          "col": 6,
+          "id": "J_6_1",
+          "is_daily_double": false,
+          "media": [
+            "https://www.j-archive.com/media/2026-09-18_J_30.jpg"
+          ],
+          "round": "J",
+          "row": 1,
+          "text": "They don't just make toys; in a famous story, they help out a poor cobbler by finishing shoes at night",
+          "value": 200
+        },
+        "J_6_2": {
+          "answer": "Dwarves",
+          "category": "BIZARRE LITTLE MEN",
+          "col": 6,
+          "id": "J_6_2",
+          "is_daily_double": false,
+          "media": [],
+          "round": "J",
+          "row": 2,
+          "text": "This bold race in \"World of Warcraft\" ride rams & are partly based on the ones in Tolkien, per the Wowpedia",
+          "value": 400
+        },
+        "J_6_3": {
+          "answer": "a leprechaun",
+          "category": "BIZARRE LITTLE MEN",
+          "col": 6,
+          "id": "J_6_3",
+          "is_daily_double": false,
+          "media": [],
+          "round": "J",
+          "row": 3,
+          "text": "The Boston Celtics' mascot Lucky, originally drawn by Red Auerbach's brother Zang, is one of these",
+          "value": 600
+        },
+        "J_6_4": {
+          "answer": "Hephaestus",
+          "category": "BIZARRE LITTLE MEN",
+          "col": 6,
+          "id": "J_6_4",
+          "is_daily_double": false,
+          "media": [],
+          "round": "J",
+          "row": 4,
+          "text": "Mythical little types are often good at metalworking, as were Greece's Cabiri, sons of this forge-working god",
+          "value": 800
+        },
+        "J_6_5": {
+          "answer": "the Zulu",
+          "category": "BIZARRE LITTLE MEN",
+          "col": 6,
+          "id": "J_6_5",
+          "is_daily_double": false,
+          "media": [],
+          "round": "J",
+          "row": 5,
+          "text": "In the legends of this largest ethnic group in South Africa, the Abatwa are tiny hunters who sleep in anthills",
+          "value": 1000
+        }
+      },
+      "name": "J"
+    }
+  },
+  "source_url": "https://j-archive.com/showgame.php?game_id=9537",
+  "title": "Show #9620, aired 2026-09-18"
+}

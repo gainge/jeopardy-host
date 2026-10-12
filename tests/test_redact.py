@@ -147,6 +147,25 @@ class RedactionTest(unittest.TestCase):
             self.assertIsNone(other["clue"]["your_revealed_answer"])
             self.assertEqual(scan(other, set()), [], f"answer leaked to {pid}")
 
+    def test_answer_screen_snapshot_is_public_and_only_after_resolution(self):
+        self.engine.apply(self.host, P.CMD_HOST_START_ROUND, {}, self.now)
+        target = "J_2_1"
+        answer = self.game.clue(target).answer
+        self.engine.apply(self.host, P.CMD_SELECT_CLUE, {"clue_id": target}, self.now)
+        self.engine.apply(self.host, P.CMD_HOST_FORCE_RESOLVE, {}, self.now)
+        for pid, snap in self.snapshots().items():
+            assert_no_leak(snap)
+            self.assertEqual(scan(snap, set()), [], f"answer leaked to {pid}")
+
+        self.engine.tick(self.now)
+        snaps = self.snapshots()
+        for pid, snap in snaps.items():
+            assert_no_leak(snap)
+            self.assertEqual(snap["clue"]["resolved_answer"], answer)
+        clue = lambda s: json.dumps(s["clue"], sort_keys=True)
+        self.assertEqual(clue(snaps[self.host]), clue(snaps[self.ids["alice"]]),
+                         "the answer screen must be the same for everyone")
+
     def test_reveal_answer_is_host_only(self):
         self.engine.apply(self.host, P.CMD_HOST_START_ROUND, {}, self.now)
         events = self.engine.apply(self.ids["alice"], P.CMD_HOST_REVEAL_RESPONSE, {}, self.now)

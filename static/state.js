@@ -57,6 +57,32 @@ export function canRevealResponse(state) {
   return clue.revealed_player_id !== clue.answering;
 }
 
+// Whether the host's "Back to board" button should be live: a resolved clue is
+// still on everyone's screen.
+export function canReturnToBoard(state) {
+  return !!state.clue && state.clue.step === 'resolved' && !!state.clue.answer;
+}
+
+// A player who already missed this clue may not buzz on the rebound.
+export function buzzLockedOut(state) {
+  return !!state.clue && (state.clue.attempted || []).includes(state.you);
+}
+
+function spendCell(board, clueId) {
+  return {
+    ...board,
+    cells: (board.cells || []).map((c) => (
+      c.clue_id === clueId ? { ...c, available: false } : c
+    )),
+  };
+}
+
+function snapshotClue(clue) {
+  if (!clue) return null;
+  const { resolved_answer: resolved, ...rest } = clue;
+  return { ...rest, attempted: clue.attempted || [], answer: resolved || null };
+}
+
 export function reduce(state, type, data) {
   const d = data || {};
   const s = { ...state, log: state.log.concat([{ type, data: d }]).slice(-200) };
@@ -73,7 +99,7 @@ export function reduce(state, type, data) {
         players: d.players || [],
         control: d.control,
         board: d.board || { categories: [], cells: [] },
-        clue: d.clue || null,
+        clue: snapshotClue(d.clue),
         final: d.final || null,
         finalReveal: null,
         // Buzz race detail is per-clue and transient; a resync starts it clean.
@@ -114,6 +140,7 @@ export function reduce(state, type, data) {
           deadline: null,
           dd: null,
           answer: null,
+          attempted: [],
           lastResult: null,
           revealed_player_id: null,
           your_revealed_answer: null,
@@ -124,7 +151,8 @@ export function reduce(state, type, data) {
 
     case 'buzzers_open':
       if (!s.clue) return s;
-      return { ...s, clue: { ...s.clue, step: 'open' } };
+      // A reopen after a miss starts a fresh race; the last one's rows are stale.
+      return { ...s, clue: { ...s.clue, step: 'open' }, buzz: emptyBuzz() };
 
     case 'buzz_registered':
       if (s.buzz.registered.includes(d.player_id)) return s;
@@ -169,6 +197,9 @@ export function reduce(state, type, data) {
           answering: null,
           deadline: null,
           lastResult: { player_id: d.player_id, correct: !!d.correct, score_delta: d.score_delta },
+          attempted: d.correct || (s.clue.attempted || []).includes(d.player_id)
+            ? (s.clue.attempted || [])
+            : (s.clue.attempted || []).concat([d.player_id]),
           revealed_player_id: null,
           your_revealed_answer: null,
         } : s.clue,
@@ -178,10 +209,14 @@ export function reduce(state, type, data) {
       return {
         ...s,
         players: applyScores(s.players, d.scores),
+        board: spendCell(s.board, d.clue_id),
         clue: s.clue ? {
           ...s.clue, step: 'resolved', answer: d.answer, answering: null, deadline: null,
         } : s.clue,
       };
+
+    case 'clue_dismissed':
+      return { ...s, clue: null, buzz: emptyBuzz() };
 
     case 'dd_revealed':
       if (!s.clue) return s;

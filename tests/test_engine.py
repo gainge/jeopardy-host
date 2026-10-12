@@ -85,6 +85,10 @@ class EngineFixture(unittest.TestCase):
         """Drain the scheduled resolution and return the clue_resolved event."""
         return first(self.engine.tick(self.now), P.EVT_CLUE_RESOLVED)
 
+    def return_to_board(self):
+        return first(self.do(self.host, P.CMD_HOST_RETURN_TO_BOARD),
+                     P.EVT_CLUE_DISMISSED)
+
 
 class PurityTest(unittest.TestCase):
     """Restated here so the engine's own suite fails loudly if purity regresses."""
@@ -345,6 +349,61 @@ class HostPowersTest(EngineFixture):
         self.assertIn("J_3_1", self.engine.state.used)
 
 
+class ReturnToBoardTest(EngineFixture):
+    """The answer screen is shared state: it stays up until the host closes it."""
+
+    def setUp(self):
+        super().setUp()
+        self.do(self.host, P.CMD_HOST_START_ROUND)
+        self.open_clue(self.host, "J_3_1")
+
+    def resolve(self):
+        self.do(self.host, P.CMD_HOST_FORCE_RESOLVE)
+        return self.resolve_pending()
+
+    def test_a_resolved_clue_holds_the_board_until_the_host_returns(self):
+        self.resolve()
+        self.assertEqual(types(self.do(self.host, P.CMD_SELECT_CLUE,
+                                       {"clue_id": "J_3_2"})), [P.EVT_ERROR])
+        self.assertEqual(self.return_to_board().payload, {"clue_id": "J_3_1"})
+        self.assertIsNone(self.engine.state.clue)
+        self.assertEqual(types(self.do(self.host, P.CMD_SELECT_CLUE,
+                                       {"clue_id": "J_3_2"})), [P.EVT_CLUE_SELECTED])
+
+    def test_only_the_host_may_return_to_the_board(self):
+        self.resolve()
+        self.assertEqual(types(self.do(self.alice, P.CMD_HOST_RETURN_TO_BOARD)),
+                         [P.EVT_ERROR])
+        self.assertIsNotNone(self.engine.state.clue)
+
+    def test_returning_before_resolution_is_refused(self):
+        self.assertEqual(types(self.do(self.host, P.CMD_HOST_RETURN_TO_BOARD)),
+                         [P.EVT_ERROR])
+        self.assertEqual(self.engine.state.clue.step, P.STEP_OPEN)
+
+    def test_a_resolved_clue_cannot_be_resolved_again(self):
+        self.resolve()
+        self.assertEqual(types(self.do(self.host, P.CMD_HOST_FORCE_RESOLVE)),
+                         [P.EVT_ERROR])
+        self.assertEqual(self.engine.tick(self.now + 10_000), [])
+
+    def test_snapshot_shows_the_answer_screen_only_once_resolved(self):
+        self.do(self.host, P.CMD_HOST_FORCE_RESOLVE)
+        pending = self.engine.snapshot_for(self.alice)["clue"]
+        self.assertIsNone(pending["resolved_answer"])
+        self.resolve_pending()
+        clue = self.engine.snapshot_for(self.alice)["clue"]
+        self.assertEqual(clue["step"], P.STEP_RESOLVED)
+        self.assertEqual(clue["resolved_answer"], self.game.clue("J_3_1").answer)
+        self.return_to_board()
+        self.assertIsNone(self.engine.snapshot_for(self.alice)["clue"])
+
+    def test_next_round_leaves_the_answer_screen_too(self):
+        self.resolve()
+        first(self.do(self.host, P.CMD_HOST_NEXT_ROUND), P.EVT_ROUND_STARTED)
+        self.assertIsNone(self.engine.state.clue)
+
+
 class ScriptedGameTest(EngineFixture):
     """One game end to end: both rounds, a Daily Double, a miss chain, a timeout,
     a host correction, an undo, and Final Jeopardy."""
@@ -355,7 +414,9 @@ class ScriptedGameTest(EngineFixture):
         self.tick(P.BUZZ_WINDOW_MS + 10)
         self.do(winner, P.CMD_SELF_REPORT,
                 {"clue_id": clue_id, "correct": correct})
-        return self.resolve_pending()
+        resolved = self.resolve_pending()
+        self.return_to_board()
+        return resolved
 
     def test_full_game(self):
         self.do(self.host, P.CMD_HOST_START_ROUND)
@@ -374,6 +435,7 @@ class ScriptedGameTest(EngineFixture):
         self.do(self.host, P.CMD_SELF_REPORT, {"clue_id": "J_2_2", "correct": False})
         self.do(self.bob, P.CMD_SELF_REPORT, {"clue_id": "J_2_2", "correct": True})
         self.resolve_pending()
+        self.return_to_board()
         self.assertEqual(self.score(self.host), -400)
         self.assertEqual(self.score(self.bob), 400)
 
@@ -387,6 +449,7 @@ class ScriptedGameTest(EngineFixture):
         self.assertEqual(self.score(self.bob), 400)
         self.do(self.host, P.CMD_HOST_FORCE_RESOLVE)
         self.resolve_pending()
+        self.return_to_board()
 
         # --- Daily Double: the selector alone plays it.
         self.do(self.host, P.CMD_HOST_SET_CONTROL, {"player_id": self.alice})
@@ -501,6 +564,9 @@ class ReplayTest(EngineFixture):
         (None, P.CMD_JOIN, {"name": "alice"}, 10),
         ("p1", P.CMD_HOST_START_ROUND, {}, 20),
         ("p1", P.CMD_SELECT_CLUE, {"clue_id": "J_2_1"}, 30),
+        ("p1", P.CMD_HOST_FORCE_RESOLVE, {}, 40),
+        ("p1", P.CMD_HOST_RETURN_TO_BOARD, {}, 50),
+        ("p1", P.CMD_SELECT_CLUE, {"clue_id": "J_2_2"}, 60),
     ]
 
     def replay(self):
@@ -511,6 +577,7 @@ class ReplayTest(EngineFixture):
 
     def test_replay_is_byte_identical(self):
         a, b = self.replay(), self.replay()
+        self.assertEqual(a.state.clue.clue_id, "J_2_2")
         self.assertEqual(json.dumps(a.state.to_dict(), sort_keys=True),
                          json.dumps(b.state.to_dict(), sort_keys=True))
 

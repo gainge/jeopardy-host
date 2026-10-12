@@ -300,6 +300,9 @@ class Engine:
         if st.phase != P.PHASE_ROUND:
             return [self._error(actor.id, "no board is in play")]
         if st.clue is not None:
+            if self._awaiting_return(st.clue):
+                return [self._error(actor.id,
+                                    "waiting for the host to return to the board")]
             return [self._error(actor.id, "a clue is already in play")]
         if st.control != actor.id:
             return [self._error(actor.id, "you do not have control of the board")]
@@ -553,10 +556,13 @@ class Engine:
         return []
 
     def _resolve(self, at: int) -> list[Event]:
+        """The clue stays in play on its answer screen until the host returns the
+        room to the board, so every client leaves it at the same moment and a
+        refresh in between lands on the same screen."""
         st = self.state
         clue = st.clue
         assert clue is not None
-        st.clue = None
+        clue.resolve_at = None
         if clue.clue_id not in st.used:
             st.used.append(clue.clue_id)
         answer = self.game.clue(clue.clue_id).answer
@@ -568,9 +574,23 @@ class Engine:
     def _force_resolve(self, actor: Player, fields: dict, now: int) -> list[Event]:
         if self.state.clue is None:
             return [self._error(actor.id, "no clue is in play")]
+        if self.state.clue.step == P.STEP_RESOLVED:
+            return [self._error(actor.id, "that clue is already resolved")]
         # Resolution is a scheduled transition, so the answer is disclosed by the
         # same code path here as everywhere else.
         return self._schedule_resolution(now)
+
+    @staticmethod
+    def _awaiting_return(clue: ClueState) -> bool:
+        """Resolved and disclosed, as opposed to resolution still pending."""
+        return clue.step == P.STEP_RESOLVED and clue.resolve_at is None
+
+    def _return_to_board(self, actor: Player, fields: dict, now: int) -> list[Event]:
+        clue = self.state.clue
+        if clue is None or not self._awaiting_return(clue):
+            return [self._error(actor.id, "no answer is on screen")]
+        self.state.clue = None
+        return [Event(P.EVT_CLUE_DISMISSED, {"clue_id": clue.clue_id})]
 
     def _adjust_score(self, actor: Player, fields: dict, now: int) -> list[Event]:
         pid = fields["player_id"]
@@ -749,7 +769,7 @@ class Engine:
 
     def _public_clue_state(self, player_id: str) -> dict[str, Any] | None:
         clue = self.state.clue
-        if clue is None or clue.step == P.STEP_RESOLVED:
+        if clue is None:
             return None
         answering = None
         if clue.step == P.STEP_DD_ANSWERING:
@@ -760,12 +780,17 @@ class Engine:
         # revealed_player_id is a fact everyone may see (mirrors EVT_ANSWER_REVEALED);
         # your_revealed_answer is the earned disclosure itself, visible only to the
         # player it was revealed to — the same shape as Final Jeopardy's
-        # your_wager/your_answer fields below.
+        # your_wager/your_answer fields below. resolved_answer mirrors
+        # clue_resolved for a reconnect onto the answer screen, and exists only
+        # once that event has fired.
+        answer = self.game.clue(clue.clue_id).answer
         return {**public, "unlock_at": clue.unlock_at,
                 "selected_by": clue.selected_by, "step": clue.step,
-                "answering": answering, "revealed_player_id": clue.revealed_to,
-                "your_revealed_answer": (self.game.clue(clue.clue_id).answer
-                                         if clue.revealed_to == player_id else None)}
+                "answering": answering, "attempted": list(clue.attempted),
+                "revealed_player_id": clue.revealed_to,
+                "your_revealed_answer": (answer if clue.revealed_to == player_id
+                                         and clue.step != P.STEP_RESOLVED else None),
+                "resolved_answer": (answer if self._awaiting_return(clue) else None)}
 
     def _public_final_state(self, player_id: str) -> dict[str, Any] | None:
         fin = self.state.final
@@ -810,4 +835,5 @@ class Engine:
         P.CMD_HOST_SET_CONTROL: _set_control,
         P.CMD_HOST_UNDO: _undo,
         P.CMD_HOST_KICK: _kick,
+        P.CMD_HOST_RETURN_TO_BOARD: _return_to_board,
     }

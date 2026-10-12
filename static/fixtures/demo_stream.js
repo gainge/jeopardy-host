@@ -67,6 +67,7 @@ export const RECORDED_STREAM = [
   ['clue_resolved', {
     clue_id: 'J_1_2', answer: 'Topeka', scores: { p1: -600, p2: 0, p3: 600 },
   }],
+  ['clue_dismissed', { clue_id: 'J_1_2' }],
 
   ['control_changed', { player_id: 'p3' }],
   ['clue_selected', {
@@ -81,6 +82,7 @@ export const RECORDED_STREAM = [
   ['clue_resolved', {
     clue_id: 'J_4_3', answer: 'a fixed affliction', scores: { p1: -600, p2: 0, p3: 1200 },
   }],
+  ['clue_dismissed', { clue_id: 'J_4_3' }],
 
   ['score_adjusted', {
     player_id: 'p1', delta: 600, reason: 'ruled acceptable on the call',

@@ -9,7 +9,14 @@ Times are integer milliseconds in **server** time. Money is a plain integer of d
 ## Transport
 
 - Server -> client: SSE on `GET /events?token=T`. Each frame is
-  `event: <type>\ndata: <json>\n\n`. Idle frames are `: heartbeat`.
+  `event: <type>\ndata: <json>\n\n`. An idle stream sends `event: ping` with
+  `data: {}` every 10s. It is transport-level, has no `EVT_` constant and never
+  reaches the reducer. Clients treat 25s of silence as a dead stream and
+  reconnect, which replays `snapshot`.
+- Every stream receives events in the order the engine produced them, and a
+  `snapshot` is never followed by an event it already reflects. Reducers may rely
+  on this: `answer_result` (a delta) always precedes the `clue_resolved` (absolute
+  scores) it led to.
 - Client -> server: `POST /api/command` with `{"type": …, …fields}`, validated by
   `protocol.validate_command`. Extra fields are dropped, missing fields rejected.
 
@@ -23,8 +30,13 @@ snapshot            // targeted, sent on connect and after reconnect; full repla
   "control": "<player_id>|null",
   "board": { "categories": ["…x6"],
              "cells": [ {"clue_id","col","row","value","available"} ] },
-  "clue": null | { …clue_selected payload…, "step": "reading|open|window|answering",
-                   "answering": "<player_id>|null" },
+  "clue": null | { …clue_selected payload…,
+                   "step": "reading|open|window|answering|dd_wager|dd_answering|resolved",
+                   "answering": "<player_id>|null",
+                   "attempted": ["<player_id>"],          // already missed; no rebound
+                   "revealed_player_id": "<player_id>|null",
+                   "your_revealed_answer": "…|null",      // see invariant 1
+                   "resolved_answer": "…|null" },         // only on the answer screen
   "final": null | { "step","category","you_wagered":bool,"you_answered":bool,
                     "submitted": ["<player_id>"] } }
 
@@ -43,7 +55,9 @@ buzz_result         { "clue_id",
 answering           { "clue_id","player_id","deadline" }
 answer_result       { "clue_id","player_id","correct":bool,"score_delta":-400 }
 clue_resolved       { "clue_id","answer","scores":{"<player_id>":1200} }
-                    // the ONLY event that ever carries a clue answer
+                    // the ONLY event that ever carries a clue answer. The clue
+                    // stays on screen (step "resolved") until clue_dismissed.
+clue_dismissed      { "clue_id" }      // host returned everyone to the board
 
 dd_revealed         { "clue_id","player_id","min_wager","max_wager" }
 dd_wager_set        { "clue_id","player_id","amount" }
@@ -69,6 +83,9 @@ error               { "message": "…" }                 // targeted at the acto
    exception is `answer_disclosed` (targeted at the current answer holder only,
    after `host_reveal_response`) and its `snapshot` mirror, `clue.your_revealed_answer`
    — never the bare `answer` key, and never sent to anyone but that one player.
+   A snapshot taken while a resolved clue is still on screen carries
+   `clue.resolved_answer`. It mirrors the `clue_resolved` broadcast everyone has
+   already received, so it is the same for every recipient.
 2. `is_daily_double` never appears in any payload. The fact is communicated solely by
    the presence of a `dd_revealed` event after selection.
 3. Final wagers and answers appear only in `final_reveal`, and a player's own choices

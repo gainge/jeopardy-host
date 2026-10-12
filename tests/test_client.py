@@ -283,7 +283,11 @@ class ReplayTest(unittest.TestCase):
     const trace = [];
     RECORDED_STREAM.forEach(([type, data], i) => {{
       s = reduce(s, type, data);
-      trace.push({{ i, type, answer: s.clue ? s.clue.answer : null }});
+      const cell = (s.board.cells || []).find((c) => c.clue_id === data.clue_id);
+      trace.push({{
+        i, type, answer: s.clue ? s.clue.answer : null, on_screen: !!s.clue,
+        cell_available: cell ? cell.available : null,
+      }});
     }});
     console.log(JSON.stringify({{
       phase: s.phase, winner: s.winner, isHost: s.isHost, you: s.you,
@@ -309,6 +313,17 @@ class ReplayTest(unittest.TestCase):
         self.assertEqual(self.result["phase"], P.PHASE_GAME_OVER)
         self.assertEqual(self.result["winner"], "p3")
 
+    def test_the_answer_screen_holds_until_dismissed_then_spends_the_cell(self):
+        trace = self.result["trace"]
+        for i, row in enumerate(trace):
+            if row["type"] != P.EVT_CLUE_RESOLVED:
+                continue
+            self.assertTrue(row["on_screen"], "a resolved clue must stay on screen")
+            self.assertFalse(row["cell_available"], "a resolved cell must be spent")
+            dismissed = trace[i + 1]
+            self.assertEqual(dismissed["type"], P.EVT_CLUE_DISMISSED)
+            self.assertFalse(dismissed["on_screen"])
+
     def test_a_clue_response_is_held_until_its_clue_resolves(self):
         for row in self.result["trace"]:
             if row["type"] != P.EVT_CLUE_RESOLVED and row["answer"] is not None:
@@ -318,6 +333,45 @@ class ReplayTest(unittest.TestCase):
                     for t in self.result["trace"])
                 self.assertTrue(seen_resolve,
                                 f"response surfaced at step {row['i']} on {row['type']}")
+
+
+@unittest.skipIf(NODE is None, "node is not installed")
+class ReboundTest(unittest.TestCase):
+    """After a miss reopens the clue, only the player who missed stays locked out."""
+
+    HARNESS = """
+    import {{ initialState, reduce, buzzLockedOut }} from '{state}';
+    const steps = [
+      ['clue_selected', {{ clue_id: 'J_1_1', category: 'C', value: 200, text: 't',
+                           media: [], unlock_at: 0, selected_by: 'p1' }}],
+      ['buzzers_open', {{ clue_id: 'J_1_1' }}],
+      ['buzz_result', {{ clue_id: 'J_1_1', order: [{{ player_id: 'p1' }}],
+                         rejected: [] }}],
+      ['answering', {{ clue_id: 'J_1_1', player_id: 'p1', deadline: 1 }}],
+      ['answer_result', {{ clue_id: 'J_1_1', player_id: 'p1', correct: false,
+                           score_delta: -200 }}],
+      ['buzzers_open', {{ clue_id: 'J_1_1' }}],
+    ];
+    const out = {{}};
+    ['p1', 'p2'].forEach((you) => {{
+      let s = {{ ...initialState(), you }};
+      steps.forEach(([t, d]) => {{ s = reduce(s, t, d); }});
+      out[you] = {{ locked: buzzLockedOut(s), step: s.clue.step,
+                   order: s.buzz.order.length }};
+    }});
+    console.log(JSON.stringify(out));
+    """
+
+    def test_only_the_player_who_missed_is_locked_out(self):
+        code = self.HARNESS.format(state="file://" + os.path.join(STATIC, "state.js"))
+        proc = subprocess.run([NODE, "--input-type=module", "-e", code],
+                              capture_output=True, text=True)
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        out = json.loads(proc.stdout)
+        self.assertTrue(out["p1"]["locked"])
+        self.assertFalse(out["p2"]["locked"])
+        self.assertEqual(out["p2"]["step"], "open")
+        self.assertEqual(out["p2"]["order"], 0, "a reopen must clear the last race")
 
 
 if __name__ == "__main__":

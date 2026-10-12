@@ -7,6 +7,7 @@
  */
 
 import { localNow } from './clock.js';
+import { buzzLockedOut } from './state.js';
 
 const READY = 'ready';
 const LOCKED = 'locked';
@@ -89,6 +90,16 @@ export class Buzzer {
     if (clue.answering) {
       this.mode = clue.answering === state.you ? PRESSED : CLOSED;
       this._paint();
+    } else if (buzzLockedOut(state)) {
+      this.mode = CLOSED;
+      this._paint();
+    } else if (clue.step === 'open' && this.mode === CLOSED) {
+      // A miss reopened the clue to everyone who has not tried it yet. PRESSED is
+      // left alone: the step reads 'open' until buzz_result, so a fresh press
+      // would otherwise re-arm itself.
+      this.pressServer = null;
+      this.mode = LOCKED;
+      this._tick();
     } else if (this.mode === LOCKED || this.mode === READY) {
       this._tick();
     } else {

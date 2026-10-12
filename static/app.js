@@ -16,7 +16,7 @@ const EVENTS = [
   'snapshot', 'error', 'players', 'round_started', 'clue_selected',
   'buzzers_open', 'buzz_registered', 'buzz_result', 'answering',
   'answer_revealed', 'answer_disclosed', 'answer_result',
-  'clue_resolved', 'dd_revealed', 'dd_wager_set', 'final_category',
+  'clue_resolved', 'clue_dismissed', 'dd_revealed', 'dd_wager_set', 'final_category',
   'final_wagers_open', 'final_wager_received', 'final_clue',
   'final_answer_received', 'final_reveal', 'final_result', 'score_adjusted',
   'game_over', 'control_changed',
@@ -24,6 +24,13 @@ const EVENTS = [
 
 const RECONNECT_MIN_MS = 500;
 const RECONNECT_MAX_MS = 8000;
+
+// The server pings every 10s. A stream silent for longer than two of those has
+// died without the socket noticing (sleep, VPN or NAT drop), and EventSource
+// would otherwise sit in OPEN forever showing a frozen game.
+const PING_MS = 10000;
+const STALE_MS = 25000;
+const WATCHDOG_MS = 5000;
 
 function ids(names) {
   const out = {};
@@ -56,6 +63,7 @@ export function collectEls() {
     ['scores', 'scores'],
     ['hostPanel', 'host-panel'], ['hostStart', 'host-start'], ['hostNext', 'host-next'],
     ['hostResolve', 'host-resolve'], ['hostReveal', 'host-reveal'],
+    ['hostReturn', 'host-return'],
     ['hostUndo', 'host-undo'],
     ['hostTarget', 'host-target'], ['hostControl', 'host-control'],
     ['hostKick', 'host-kick'], ['hostAdjustForm', 'host-adjust-form'],
@@ -87,6 +95,8 @@ export function main() {
   let session = loadSession();
   let stream = null;
   let backoff = RECONNECT_MIN_MS;
+  let lastFrameAt = 0;
+  let retryTimer = null;
 
   const send = (command) => {
     if (!session) return;
@@ -126,21 +136,56 @@ export function main() {
   };
 
   const connect = () => {
+    if (retryTimer !== null) clearTimeout(retryTimer);
+    retryTimer = null;
     if (stream) stream.close();
-    stream = new EventSource(`/events?token=${encodeURIComponent(session.token)}`);
+    lastFrameAt = Date.now();
+    const es = new EventSource(`/events?token=${encodeURIComponent(session.token)}`);
+    stream = es;
+    const alive = () => { lastFrameAt = Date.now(); };
     EVENTS.forEach((type) => {
-      stream.addEventListener(type, (e) => apply(type, e.data));
+      es.addEventListener(type, (e) => { alive(); apply(type, e.data); });
     });
-    stream.addEventListener('open', () => {
+    es.addEventListener('ping', alive);
+    es.addEventListener('open', () => {
+      alive();
       backoff = RECONNECT_MIN_MS;
       els.link.classList.remove('down');
       clock.sync();
     });
-    stream.addEventListener('error', () => {
+    es.addEventListener('error', () => {
+      // A superseded stream's late error must not schedule a second reconnect.
+      if (es !== stream) return;
       els.link.classList.add('down');
-      stream.close();
-      setTimeout(connect, backoff);
+      es.close();
+      retryTimer = setTimeout(connect, backoff);
       backoff = Math.min(RECONNECT_MAX_MS, backoff * 2);
+    });
+  };
+
+  // Reconnecting is always safe: the server opens every stream with a snapshot
+  // that replaces client state wholesale.
+  const resyncIfStale = (thresholdMs) => {
+    if (!stream || retryTimer !== null) return;
+    if (Date.now() - lastFrameAt > thresholdMs) {
+      els.link.classList.add('down');
+      connect();
+    }
+  };
+
+  let watching = false;
+  const watchLiveness = () => {
+    if (watching) return;
+    watching = true;
+    setInterval(() => resyncIfStale(STALE_MS), WATCHDOG_MS);
+    // Timers are throttled in background tabs and frozen across sleep, so
+    // coming back is checked directly rather than left to the next interval.
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') resyncIfStale(PING_MS);
+    });
+    window.addEventListener('online', () => resyncIfStale(0));
+    window.addEventListener('pageshow', (e) => {
+      if (e.persisted) resyncIfStale(0);
     });
   };
 
@@ -149,6 +194,7 @@ export function main() {
     els.gameView.hidden = false;
     clock.start();
     connect();
+    watchLiveness();
     paint();
   };
 

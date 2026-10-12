@@ -14,9 +14,12 @@ import threading
 from typing import Any, Callable, Iterator
 
 QUEUE_MAX = 64
-HEARTBEAT_S = 15
+HEARTBEAT_S = 10
 
-_HEARTBEAT_FRAME = b": heartbeat\n\n"
+# A named event rather than an SSE comment: EventSource never surfaces comments
+# to script, and the client's watchdog needs to see the line is alive to tell a
+# quiet game from a connection that died without a FIN.
+_HEARTBEAT_FRAME = b"event: ping\ndata: {}\n\n"
 
 
 def encode(event_type: str, payload: dict[str, Any]) -> bytes:
@@ -27,7 +30,7 @@ def encode(event_type: str, payload: dict[str, Any]) -> bytes:
 
 
 class Subscription:
-    """Iterating yields encoded SSE frames, emitting a heartbeat comment on idle."""
+    """Iterating yields encoded SSE frames, emitting a heartbeat event on idle."""
 
     _ids = itertools.count(1)
 

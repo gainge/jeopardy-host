@@ -12,7 +12,7 @@
  * what it is being kept from seeing.
  */
 
-import { playerName, canRevealResponse } from './state.js';
+import { playerName, canRevealResponse, canReturnToBoard } from './state.js';
 
 const FLAGGED = new Set(['early', 'future', 'clamped', 'duplicate']);
 
@@ -28,6 +28,7 @@ export function mountHost(els, send) {
   els.hostNext.addEventListener('click', () => send({ type: 'host_next_round' }));
   els.hostResolve.addEventListener('click', () => send({ type: 'host_force_resolve' }));
   els.hostReveal.addEventListener('click', () => send({ type: 'host_reveal_response' }));
+  els.hostReturn.addEventListener('click', () => send({ type: 'host_return_to_board' }));
   els.hostUndo.addEventListener('click', () => send({ type: 'host_undo' }));
 
   els.hostAdjustForm.addEventListener('submit', (e) => {
@@ -81,6 +82,9 @@ export function renderHost(state, els) {
   els.hostNext.hidden = state.phase === 'lobby';
 
   els.hostReveal.hidden = !canRevealResponse(state);
+  const returnable = canReturnToBoard(state);
+  els.hostReturn.hidden = !returnable;
+  els.hostResolve.hidden = returnable;
 
   els.hostDiag.replaceChildren();
   state.players.forEach((p) => {

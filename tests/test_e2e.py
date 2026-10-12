@@ -196,6 +196,15 @@ class EndToEndTest(unittest.TestCase):
         self.assertEqual(resolved["answer"], "archipelago")
         self.assertEqual(resolved["scores"][alice.player_id], 200)
 
+        # The answer screen holds the board until the host returns everyone to it.
+        alice.send(P.CMD_SELECT_CLUE, clue_id="J_2_2")
+        self.assertIn("host", alice.wait_for(P.EVT_ERROR)["message"])
+        host.send(P.CMD_HOST_RETURN_TO_BOARD)
+        self.assertEqual(alice.wait_for(P.EVT_CLUE_DISMISSED), {"clue_id": "J_2_1"})
+        self.assertEqual(host.wait_for(P.EVT_CLUE_DISMISSED), {"clue_id": "J_2_1"})
+        alice.send(P.CMD_SELECT_CLUE, clue_id="J_2_2")
+        self.assertEqual(alice.wait_for(P.EVT_CLUE_SELECTED)["clue_id"], "J_2_2")
+
     def test_slow_link_that_pressed_first_beats_fast_link_that_pressed_second(self):
         """The claim the whole design exists to support."""
         host = self.join("Gibson", admin_token="test-admin-token")

@@ -38,6 +38,7 @@ HOST_COMMAND_FIELDS = {
     P.CMD_HOST_ADJUST_SCORE: {"player_id": "p_x", "delta": -400, "reason": "misjudged"},
     P.CMD_HOST_SET_CONTROL: {"player_id": "p_x"},
     P.CMD_HOST_KICK: {"player_id": "p_x"},
+    P.CMD_HOST_RETURN_TO_BOARD: {},
 }
 
 
@@ -170,14 +171,14 @@ class HubTest(unittest.TestCase):
         self.assertTrue(done.wait(timeout=5))
         self.assertEqual(len(drained), total)
 
-    def test_idle_stream_emits_a_heartbeat_comment(self):
+    def test_idle_stream_emits_a_heartbeat_event(self):
         hub = Hub()
         sub = hub.subscribe("p1")
         import jeopardy.hub as hub_mod
         original = hub_mod.HEARTBEAT_S
         hub_mod.HEARTBEAT_S = 0.05
         try:
-            self.assertEqual(next(iter(sub.stream())), b": heartbeat\n\n")
+            self.assertEqual(next(iter(sub.stream())), b"event: ping\ndata: {}\n\n")
         finally:
             hub_mod.HEARTBEAT_S = original
 
@@ -294,6 +295,52 @@ class ServerReplayTest(unittest.TestCase):
         self.assertEqual(revived.host_id, host["player_id"])
         self.assertEqual(revived.resolve(host["token"]), host["player_id"])
         self.assertEqual(revived.resolve(guest["token"]), guest["player_id"])
+
+
+class FanoutOrderingTest(unittest.TestCase):
+    """Every frame is queued under the engine lock. Otherwise a scheduler tick can
+    overtake the command that scheduled it: clue_resolved lands ahead of
+    answer_result and the client applies that score twice."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.app = make_app(self.tmp.name)
+        self.addCleanup(self.app.stop)
+        self.unlocked = []
+        original = self.app.hub._fan
+
+        def checked(frame, only):
+            if not self._lock_held_elsewhere():
+                self.unlocked.append(frame.split(b"\n", 1)[0])
+            return original(frame, only)
+
+        self.app.hub._fan = checked
+
+    def _lock_held_elsewhere(self):
+        """Asked from another thread, since an RLock always admits its owner."""
+        result = []
+
+        def probe():
+            got = self.app.lock.acquire(blocking=False)
+            if got:
+                self.app.lock.release()
+            result.append(not got)
+
+        t = threading.Thread(target=probe)
+        t.start()
+        t.join()
+        return result[0]
+
+    def test_commands_ticks_joins_and_streams_all_fan_out_under_the_lock(self):
+        host = self.app.join("Gibson", admin_token="ADMIN")
+        guest = self.app.join("Ada")
+        self.app.command(guest["token"], {"type": P.CMD_SELECT_CLUE,
+                                          "clue_id": "J_2_3"})
+        self.app._on_due(now_ms())
+        sub = self.app.attach(host["player_id"])
+        self.app.detach(sub)
+        self.assertEqual(self.unlocked, [])
 
 
 class HttpTestCase(unittest.TestCase):

@@ -162,7 +162,7 @@ class GameServer:
             self.tokens[token] = player_id
             is_host = player_id == self.host_id
             self.scheduler.schedule(self.engine.next_deadline())
-        self._fanout(events)
+            self._fanout(events)
         return {"player_id": player_id, "token": token, "is_host": is_host}
 
     def _joined_id(self, events) -> str:
@@ -198,17 +198,18 @@ class GameServer:
             self.store.append(player_id, ctype, fields, now)
             events = self.engine.apply(player_id, ctype, fields, now)
             self.scheduler.schedule(self.engine.next_deadline())
-        self._fanout(events)
+            self._fanout(events)
 
     def attach(self, player_id: str):
         """Subscribe a stream and seed it with a snapshot. The snapshot is queued
-        after the subscription exists, so no event can slip between the two."""
+        after the subscription exists and under the engine lock, so no event can
+        slip between the two or land ahead of the state it follows."""
         sub = self.hub.subscribe(player_id)
         with self.lock:
             self._set_connected(player_id, True)
-            snapshot = self.engine.snapshot_for(player_id)
-        self.hub.send_to(player_id, P.EVT_SNAPSHOT, snapshot)
-        self.hub.broadcast(P.EVT_PLAYERS, self.roster())
+            self.hub.send_to(player_id, P.EVT_SNAPSHOT,
+                             self.engine.snapshot_for(player_id))
+            self.hub.broadcast(P.EVT_PLAYERS, self.roster())
         return sub
 
     def detach(self, sub) -> None:
@@ -227,6 +228,11 @@ class GameServer:
     # --- internals ---------------------------------------------------------
 
     def _fanout(self, events) -> None:
+        """Callers hold the engine lock. Queues are filled in the order the engine
+        produced events; fanning out after release would let a scheduler tick
+        (say clue_resolved) overtake the command that set it up (answer_result),
+        and the client would apply that score twice. Hub only enqueues, so the
+        lock is never held across a socket write."""
         for event in events or ():
             if event.targets is None:
                 self.hub.broadcast(event.type, event.payload)
@@ -239,13 +245,12 @@ class GameServer:
             self.store.append(None, TICK_ENTRY, {}, now)
             events = self.engine.tick(now)
             self.scheduler.schedule(self.engine.next_deadline())
-        self._fanout(events)
+            self._fanout(events)
 
     def _on_reap(self, player_id: str) -> None:
         with self.lock:
-            changed = self._set_connected(player_id, False)
-        if changed:
-            self.hub.broadcast(P.EVT_PLAYERS, self.roster())
+            if self._set_connected(player_id, False):
+                self.hub.broadcast(P.EVT_PLAYERS, self.roster())
 
     def _set_connected(self, player_id: str, value: bool) -> bool:
         """Connection liveness is transport state, not a game rule, so it is not

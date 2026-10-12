@@ -12,6 +12,11 @@ shown the real answer, at host discretion, before self-report (engine.py's
 `answer` key, the same way Final Jeopardy's own wager/answer already travel under
 `your_wager`/`your_answer` — so it never trips the `SECRET_KEYS`/`SEALED_KEYS`
 guard below, and never reaches anyone but the player it was revealed to.
+
+A snapshot taken while a resolved clue is still on screen carries its answer as
+`resolved_answer`. That is not a disclosure of its own: it mirrors the
+`clue_resolved` broadcast everyone has already received, so a reconnect lands on
+the same answer screen the room is looking at.
 """
 
 from __future__ import annotations

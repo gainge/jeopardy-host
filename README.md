@@ -87,3 +87,12 @@ convention:
 - **j-archive's disclaimer asks people not to scrape it.** It's a fan-run site and
   this is a private tool for a handful of people, but it's your call to make
   knowingly. Be polite: scrape a game once and play it from the saved JSON.
+- **Behind a reverse proxy, turn off buffering for `/events`.** The game streams
+  over SSE with a ping every 10s, and clients reconnect if the stream goes quiet
+  for 25s. nginx honours the `X-Accel-Buffering: no` header the server already
+  sends, but a proxy that buffers or idles out long responses needs, in nginx terms,
+  `proxy_buffering off;` and `proxy_read_timeout` well above 10s on that location.
+- **The game journal (`games/<id>/events.jsonl`) belongs to the server version
+  that wrote it.** A resolved clue now waits for the host's "Back to board", so a
+  journal from before that change will not replay cleanly. Start a fresh game
+  after upgrading.

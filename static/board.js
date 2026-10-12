@@ -137,7 +137,11 @@ function renderClue(state, ctx) {
 }
 
 function clueStatus(state, clue) {
-  if (clue.step === 'resolved') return 'correct response:';
+  if (clue.step === 'resolved') {
+    return state.isHost
+      ? 'correct response:'
+      : 'correct response (the host will return to the board):';
+  }
   if (clue.answering) {
     if (clue.answering === state.you) {
       return clue.your_revealed_answer

@@ -37,11 +37,12 @@ CMD_HOST_ADJUST_SCORE = "host_adjust_score"
 CMD_HOST_SET_CONTROL = "host_set_control"
 CMD_HOST_UNDO = "host_undo"
 CMD_HOST_KICK = "host_kick"
+CMD_HOST_RETURN_TO_BOARD = "host_return_to_board"
 
 HOST_COMMANDS = frozenset({
     CMD_HOST_START_ROUND, CMD_HOST_NEXT_ROUND, CMD_HOST_FORCE_RESOLVE,
     CMD_HOST_REVEAL_RESPONSE, CMD_HOST_ADJUST_SCORE, CMD_HOST_SET_CONTROL,
-    CMD_HOST_UNDO, CMD_HOST_KICK,
+    CMD_HOST_UNDO, CMD_HOST_KICK, CMD_HOST_RETURN_TO_BOARD,
 })
 
 # --- Events: server -> client (SSE on /events) -------------------------------
@@ -59,6 +60,7 @@ EVT_ANSWER_REVEALED = "answer_revealed"   # broadcast fact only: {clue_id, playe
 EVT_ANSWER_DISCLOSED = "answer_disclosed" # targeted at the answer holder; carries the answer
 EVT_ANSWER_RESULT = "answer_result"
 EVT_CLUE_RESOLVED = "clue_resolved"       # the only event that discloses the answer to everyone
+EVT_CLUE_DISMISSED = "clue_dismissed"     # host closed the answer screen; board is back
 EVT_DD_REVEALED = "dd_revealed"
 EVT_DD_WAGER_SET = "dd_wager_set"
 EVT_FINAL_CATEGORY = "final_category"
@@ -175,6 +177,7 @@ COMMAND_SCHEMA: dict[str, dict[str, Callable[[Any], Any]]] = {
     CMD_HOST_SET_CONTROL: {"player_id": _str(64)},
     CMD_HOST_UNDO: {},
     CMD_HOST_KICK: {"player_id": _str(64)},
+    CMD_HOST_RETURN_TO_BOARD: {},
 }
 
 
